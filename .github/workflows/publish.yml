@@ -1,0 +1,38 @@
+name: Publish to Marketplace
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: "Optional vsce version bump (patch/minor/major). Leave empty to publish package.json version as-is."
+        required: false
+        default: ""
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run compile
+      - name: Publish to Visual Studio Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "Missing VSCE_PAT secret. Add a Marketplace Manage PAT in repo Settings → Secrets."
+            exit 1
+          fi
+          if [ -n "${{ github.event.inputs.version_bump }}" ]; then
+            npx vsce publish "${{ github.event.inputs.version_bump }}" -p "$VSCE_PAT"
+          else
+            npx vsce publish -p "$VSCE_PAT"
+          fi

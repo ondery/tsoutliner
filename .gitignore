@@ -1,0 +1,11 @@
+node_modules/
+out/
+dist/
+build/
+coverage/
+*.vsix
+.vscode-test/
+*.log
+.DS_Store
+Thumbs.db
+PUBLISHING.md

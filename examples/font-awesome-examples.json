@@ -1,0 +1,73 @@
+{
+  "fontAwesome-solid-examples": {
+    "public": "fas fa-globe",
+    "private": "fas fa-lock",
+    "protected": "fas fa-shield-alt",
+    "static": "fas fa-thumbtack",
+    "readonly": "fas fa-book-open",
+    "abstract": "fas fa-theater-masks",
+    "async": "fas fa-bolt",
+    "export": "fas fa-share-square",
+    "default": "fas fa-star",
+    "constructor": "fas fa-hammer",
+    "property": "fas fa-tag",
+    "method": "fas fa-cog",
+    "function": "fas fa-wrench",
+    "getter": "fas fa-download",
+    "setter": "fas fa-upload",
+    "class": "fas fa-cube",
+    "interface": "fas fa-clipboard-list"
+  },
+  "fontAwesome-alternative-examples": {
+    "public": "fas fa-unlock",
+    "private": "fas fa-user-secret",
+    "protected": "fas fa-exclamation-triangle",
+    "static": "fas fa-anchor",
+    "readonly": "far fa-eye",
+    "abstract": "fas fa-ghost",
+    "async": "fas fa-rocket",
+    "export": "fas fa-external-link-alt",
+    "default": "fas fa-crown",
+    "constructor": "fas fa-tools",
+    "property": "fas fa-tags",
+    "method": "fas fa-cogs",
+    "function": "fas fa-calculator",
+    "getter": "far fa-eye",
+    "setter": "fas fa-edit",
+    "class": "fas fa-building",
+    "interface": "fas fa-file-contract"
+  },
+  "fontAwesome-colorful-examples": {
+    "public": "fas fa-broadcast-tower",
+    "private": "fas fa-key",
+    "protected": "fas fa-user-shield",
+    "static": "fas fa-map-pin",
+    "readonly": "fas fa-glasses",
+    "abstract": "fas fa-magic",
+    "async": "fas fa-sync",
+    "export": "fas fa-paper-plane",
+    "default": "fas fa-gem",
+    "constructor": "fas fa-industry",
+    "property": "fas fa-sticky-note",
+    "method": "fas fa-sliders-h",
+    "function": "fas fa-desktop",
+    "getter": "fas fa-search",
+    "setter": "fas fa-save",
+    "class": "fas fa-archive",
+    "interface": "fas fa-scroll"
+  },
+  "usage": {
+    "description": "Bu dosya FontAwesome ikon örneklerini içerir. Kullanmak için:",
+    "steps": [
+      "1. VS Code ayarlarına git (Ctrl+,)",
+      "2. 'tsOutlineEnhancer.iconType' ayarını 'fontawesome' yap",
+      "3. 'tsOutlineEnhancer.fontAwesomeSettings' ayarına istediğin stil grubunu kopyala",
+      "4. FontAwesome fontunun sisteminde yüklü olduğundan emin ol"
+    ],
+    "notes": [
+      "FontAwesome 6.4.0+ sürümü gerekli",
+      "Internet bağlantısı gerekli (CDN kullanılıyor)",
+      "Alternatif olarak local FontAwesome font kurabilirsin"
+    ]
+  }
+}

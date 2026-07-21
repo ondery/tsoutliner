@@ -1,0 +1,21 @@
+{
+  "name": "ts-outliner-demo",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc -p ./",
+    "test": "node ./out/test.js"
+  },
+  "dependencies": {
+    "react": "^18.0.0"
+  },
+  "features": {
+    "outline": true,
+    "languages": ["typescript", "javascript", "markdown", "json"]
+  },
+  "contributors": [
+    {
+      "name": "Öndery",
+      "role": "maintainer"
+    }
+  ]
+}

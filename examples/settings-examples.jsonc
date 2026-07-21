@@ -1,0 +1,60 @@
+{
+    // 2. Font Family Ayarları
+    "tsOutlineEnhancer.fontFamily": "Fira Code, JetBrains Mono, Consolas, monospace",
+    "tsOutlineEnhancer.fontSize": 14,
+    "tsOutlineEnhancer.lineHeight": 1.3,
+    // 3. İkon Görünüm Ayarları (YENİ!)
+    "tsOutlineEnhancer.iconSize": 16, // İkon büyüklüğü (8-32 px)
+    "tsOutlineEnhancer.iconSpacing": 4, // İkonlar arası boşluk (0-20 px)/ TS OUTLINER Extension Settings Examples
+    // 1. İkon Türü Seçimi
+    "tsOutlineEnhancer.iconType": "emoji", // "emoji", "fontawesome", "none"
+    // 2. Font Family Ayarları
+    "tsOutlineEnhancer.fontFamily": "Fira Code, JetBrains Mono, Consolas, monospace",
+    "tsOutlineEnhancer.fontSize": 14,
+    "tsOutlineEnhancer.lineHeight": 1.3,
+    // 4. Emoji Ayarları (iconType: "emoji" için)
+    "tsOutlineEnhancer.emojiSettings": {
+        "public": "🟢",
+        "private": "🔴",
+        "protected": "🟡",
+        "static": "📌",
+        "readonly": "👁️",
+        "abstract": "💭",
+        "async": "⚡",
+        "export": "📤",
+        "default": "⭐",
+        "constructor": "🏗️",
+        "property": "🏷️",
+        "method": "⚙️",
+        "function": "🔧",
+        "getter": "📤",
+        "setter": "📥",
+        "class": "📦",
+        "interface": "📋"
+    },
+    // 5. FontAwesome Ayarları (iconType: "fontawesome" için)
+    "tsOutlineEnhancer.fontAwesomeSettings": {
+        "public": "fas fa-globe",
+        "private": "fas fa-lock",
+        "protected": "fas fa-shield-alt",
+        "static": "fas fa-thumbtack",
+        "readonly": "fas fa-book-open",
+        "abstract": "fas fa-theater-masks",
+        "async": "fas fa-bolt",
+        "export": "fas fa-share-square",
+        "default": "fas fa-star",
+        "constructor": "fas fa-hammer",
+        "property": "fas fa-tag",
+        "method": "fas fa-cog",
+        "function": "fas fa-wrench",
+        "getter": "fas fa-download",
+        "setter": "fas fa-upload",
+        "class": "fas fa-cube",
+        "interface": "fas fa-clipboard-list"
+    },
+    // 6. Diğer Ayarlar
+    "tsOutlineEnhancer.showIconsInLabel": true,
+    "tsOutlineEnhancer.showVisibilityInLabel": false,
+    "tsOutlineEnhancer.autoSelectCurrentElement": false,
+    "tsOutlineEnhancer.sortMode": "position"
+}

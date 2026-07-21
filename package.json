@@ -1,0 +1,882 @@
+{
+  "name": "tsoutliner",
+  "author": {
+    "name": "Öndery",
+    "url": "https://github.com/ondery"
+  },
+  "displayName": "TS Outliner",
+  "description": "Enhanced outline view for TypeScript, JavaScript, JSX, TSX, Markdown, and JSON with customizable icons, fonts, and sorting.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ondery/tsoutliner.git"
+  },
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:markdown",
+    "onLanguage:json",
+    "onLanguage:jsonc",
+    "onView:tsOutlineEnhancer.webview"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tsOutlineEnhancer.refresh",
+        "title": "Refresh Outline",
+        "category": "TS Outliner",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "tsOutlineEnhancer.openEmojiSettings",
+        "title": "Open Emoji Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.openIconSettings",
+        "title": "Open Icon Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.openFontSettings",
+        "title": "Open Font Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.openIconAppearanceSettings",
+        "title": "Open Icon Appearance Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.openAllSettings",
+        "title": "Open Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.selectFont",
+        "title": "Select Font Family",
+        "category": "TS Outliner",
+        "icon": "$(symbol-text)"
+      },
+      {
+        "command": "tsOutlineEnhancer.sortByPosition",
+        "title": "Sort By: Position",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.sortByName",
+        "title": "Sort By: Name",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.sortByCategory",
+        "title": "Sort By: Category",
+        "category": "TS Outliner"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ts-outliner",
+          "title": "TS Outliner",
+          "icon": "media/activitybar.svg"
+        }
+      ]
+    },
+    "views": {
+      "ts-outliner": [
+        {
+          "type": "webview",
+          "id": "tsOutlineEnhancer.webview",
+          "name": "Outline",
+          "contextualTitle": "TS Outliner",
+          "icon": "media/activitybar.svg"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "TS Outliner",
+      "properties": {
+        "tsOutlineEnhancer.iconType": {
+          "type": "string",
+          "enum": [
+            "emoji",
+            "fontawesome",
+            "none"
+          ],
+          "default": "emoji",
+          "description": "Choose icon type for visibility and modifiers",
+          "enumDescriptions": [
+            "Use emoji icons (🌐, 🔒, etc.)",
+            "Use FontAwesome icons (requires FontAwesome font installed)",
+            "Don't show any icons"
+          ]
+        },
+        "tsOutlineEnhancer.fontFamily": {
+          "type": "string",
+          "enum": [
+            "inherit",
+            "Consolas, 'Courier New', monospace",
+            "Fira Code, 'Courier New', monospace",
+            "'JetBrains Mono', 'Courier New', monospace",
+            "'Source Code Pro', 'Courier New', monospace",
+            "'Cascadia Code', 'Courier New', monospace",
+            "'SF Mono', Monaco, 'Courier New', monospace",
+            "'Roboto Mono', 'Courier New', monospace",
+            "'Ubuntu Mono', 'Courier New', monospace",
+            "'Droid Sans Mono', 'Courier New', monospace",
+            "'Inconsolata', 'Courier New', monospace",
+            "'Monaco', 'Courier New', monospace",
+            "'Menlo', 'Courier New', monospace",
+            "'DejaVu Sans Mono', 'Courier New', monospace",
+            "'Liberation Mono', 'Courier New', monospace",
+            "'Hack', 'Courier New', monospace",
+            "'Anonymous Pro', 'Courier New', monospace",
+            "'Noto Sans Mono', 'Courier New', monospace",
+            "'PT Mono', 'Courier New', monospace",
+            "'IBM Plex Mono', 'Courier New', monospace",
+            "'Victor Mono', 'Courier New', monospace",
+            "'Input Mono', 'Courier New', monospace",
+            "'Operator Mono', 'Courier New', monospace",
+            "'Fantasque Sans Mono', 'Courier New', monospace",
+            "'Lucida Console', Monaco, monospace",
+            "'Courier New', Courier, monospace",
+            "Arial, sans-serif",
+            "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            "'Helvetica Neue', Helvetica, Arial, sans-serif",
+            "Calibri, sans-serif",
+            "Tahoma, Geneva, sans-serif",
+            "Verdana, Geneva, sans-serif",
+            "'Trebuchet MS', 'Lucida Grande', sans-serif",
+            "'Times New Roman', Times, serif",
+            "Georgia, 'Times New Roman', serif",
+            "Cambria, serif",
+            "Constantia, serif",
+            "Impact, Arial Black, sans-serif",
+            "'Arial Black', Arial, sans-serif",
+            "Candara, sans-serif",
+            "Corbel, sans-serif"
+          ],
+          "enumDescriptions": [
+            "Use VS Code's editor font family (Recommended)",
+            "Consolas - Clean monospace font (Windows default)",
+            "Fira Code - Popular programming font with ligatures",
+            "JetBrains Mono - Modern programming font",
+            "Source Code Pro - Adobe's programming font",
+            "Cascadia Code - Microsoft's programming font",
+            "SF Mono - Apple's monospace font",
+            "Roboto Mono - Google's monospace font",
+            "Ubuntu Mono - Ubuntu's default monospace font",
+            "Droid Sans Mono - Android's monospace font",
+            "Inconsolata - Popular programming font",
+            "Monaco - macOS classic monospace font",
+            "Menlo - macOS default terminal font",
+            "DejaVu Sans Mono - Open source monospace font",
+            "Liberation Mono - Open source alternative to Courier",
+            "Hack - Typeface designed for source code",
+            "Anonymous Pro - Clean programming font",
+            "Noto Sans Mono - Google's universal monospace font",
+            "PT Mono - Monospace font by ParaType",
+            "IBM Plex Mono - IBM's modern monospace font",
+            "Victor Mono - Programming font with cursive italics",
+            "Input Mono - Font designed specifically for code",
+            "Operator Mono - Premium programming font",
+            "Fantasque Sans Mono - Programming font with personality",
+            "Lucida Console - Windows system monospace font",
+            "Courier New - Classic monospace font",
+            "Arial - Clean sans-serif font",
+            "Segoe UI - Windows system font",
+            "Helvetica Neue - Modern sans-serif font",
+            "Calibri - Microsoft Office default font",
+            "Tahoma - Readable sans-serif font",
+            "Verdana - Screen-optimized sans-serif font",
+            "Trebuchet MS - Humanist sans-serif font",
+            "Times New Roman - Classic serif font",
+            "Georgia - Screen-optimized serif font",
+            "Cambria - Modern serif font",
+            "Constantia - Transitional serif font",
+            "Impact - Bold condensed sans-serif font",
+            "Arial Black - Heavy weight sans-serif font",
+            "Candara - ClearType optimized sans-serif font",
+            "Corbel - ClearType optimized sans-serif font"
+          ],
+          "default": "Consolas, 'Courier New', monospace",
+          "description": "Font family for the outline view. Choose from popular programming fonts, system fonts, or use 'inherit' to match VS Code's editor font."
+        },
+        "tsOutlineEnhancer.fontSize": {
+          "type": "number",
+          "default": 13,
+          "minimum": 8,
+          "maximum": 30,
+          "description": "Font size for the outline view (in pixels)"
+        },
+        "tsOutlineEnhancer.lineHeight": {
+          "type": "number",
+          "default": 1.2,
+          "minimum": 0.8,
+          "maximum": 3,
+          "description": "Line height multiplier for the outline view"
+        },
+        "tsOutlineEnhancer.iconSize": {
+          "type": "number",
+          "default": 16,
+          "minimum": 8,
+          "maximum": 32,
+          "description": "Icon size in pixels for visibility and modifier icons"
+        },
+        "tsOutlineEnhancer.iconSpacing": {
+          "type": "number",
+          "default": 4,
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Spacing between icons in pixels"
+        },
+        "tsOutlineEnhancer.iconToTextSpacing": {
+          "type": "number",
+          "default": 6,
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Spacing between icons and text in pixels"
+        },
+        "tsOutlineEnhancer.tooltipFontSize": {
+          "type": "number",
+          "default": 11,
+          "minimum": 8,
+          "maximum": 20,
+          "description": "Font size for tooltips in pixels"
+        },
+        "tsOutlineEnhancer.showTooltipPrefixes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show prefixes in tooltips (e.g., 'Type: Method' vs 'Method')"
+        },
+        "tsOutlineEnhancer.showIconsInLabel": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show icons in labels for visibility and modifiers (depends on iconType setting)"
+        },
+        "tsOutlineEnhancer.showVisibilityInLabel": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show visibility (public/private/protected) in the label"
+        },
+        "tsOutlineEnhancer.emojiSettings": {
+          "type": "object",
+          "default": {
+            "public": "🌐",
+            "private": "🔒",
+            "protected": "🛡️",
+            "static": "📌",
+            "readonly": "📖",
+            "abstract": "🎭",
+            "async": "⚡",
+            "export": "📤",
+            "default": "🌟",
+            "constructor": "🏗️",
+            "property": "📝",
+            "method": "⚙️",
+            "function": "🔧",
+            "getter": "📤",
+            "setter": "📥",
+            "class": "📦",
+            "interface": "📋",
+            "heading": "📑",
+            "variable": "💠",
+            "constant": "🔷",
+            "enum": "📚",
+            "enumMember": "▪️",
+            "module": "📁",
+            "namespace": "📂",
+            "typeAlias": "🏷️",
+            "file": "📄",
+            "object": "🧩",
+            "array": "📋",
+            "key": "🔑",
+            "event": "📡",
+            "operator": "➗",
+            "typeParameter": "Ｔ"
+          },
+          "properties": {
+            "public": {
+              "type": "string",
+              "default": "🌐",
+              "description": "Emoji for public members",
+              "examples": [
+                "🌐",
+                "🟢",
+                "✅",
+                "📢",
+                "🔓",
+                "🆔",
+                "👥",
+                "📡"
+              ]
+            },
+            "private": {
+              "type": "string",
+              "default": "🔒",
+              "description": "Emoji for private members",
+              "examples": [
+                "🔒",
+                "🔴",
+                "❌",
+                "🚫",
+                "👁️‍🗨️",
+                "🔐",
+                "🕳️",
+                "🖤"
+              ]
+            },
+            "protected": {
+              "type": "string",
+              "default": "🛡️",
+              "description": "Emoji for protected members",
+              "examples": [
+                "🛡️",
+                "🟡",
+                "⚠️",
+                "🔰",
+                "🛃",
+                "🟧",
+                "🔶",
+                "🧡"
+              ]
+            },
+            "static": {
+              "type": "string",
+              "default": "📌",
+              "description": "Emoji for static members",
+              "examples": [
+                "📌",
+                "📍",
+                "🔧",
+                "🏗️",
+                "🎯",
+                "🔩",
+                "⚙️",
+                "🛠️"
+              ]
+            },
+            "readonly": {
+              "type": "string",
+              "default": "📖",
+              "description": "Emoji for readonly members",
+              "examples": [
+                "📖",
+                "👁️",
+                "🔍",
+                "📋",
+                "📄",
+                "👀",
+                "🔎",
+                "📚"
+              ]
+            },
+            "abstract": {
+              "type": "string",
+              "default": "🎭",
+              "description": "Emoji for abstract members",
+              "examples": [
+                "🎭",
+                "💭",
+                "🔮",
+                "👻",
+                "🌟",
+                "💫",
+                "🪄",
+                "🌀"
+              ]
+            },
+            "async": {
+              "type": "string",
+              "default": "⚡",
+              "description": "Emoji for async members",
+              "examples": [
+                "⚡",
+                "🚀",
+                "🔄",
+                "⏳",
+                "💫",
+                "🌀",
+                "🔥",
+                "⏰"
+              ]
+            },
+            "export": {
+              "type": "string",
+              "default": "📤",
+              "description": "Emoji for exported members",
+              "examples": [
+                "📤",
+                "📡",
+                "🚀",
+                "📋",
+                "🎯",
+                "🔗",
+                "📢",
+                "🌐"
+              ]
+            },
+            "default": {
+              "type": "string",
+              "default": "🌟",
+              "description": "Emoji for default exports",
+              "examples": [
+                "🌟",
+                "⭐",
+                "🎯",
+                "👑",
+                "💎",
+                "🏆",
+                "🥇",
+                "✨"
+              ]
+            },
+            "constructor": {
+              "type": "string",
+              "default": "🏗️",
+              "description": "Emoji for constructors",
+              "examples": [
+                "🏗️",
+                "🔨",
+                "🛠️",
+                "⚒️",
+                "🏭",
+                "🔧",
+                "⚙️",
+                "🎯"
+              ]
+            },
+            "property": {
+              "type": "string",
+              "default": "📝",
+              "description": "Emoji for properties",
+              "examples": [
+                "📝",
+                "🏷️",
+                "📄",
+                "📊",
+                "💼",
+                "📂",
+                "🗂️",
+                "📋"
+              ]
+            },
+            "method": {
+              "type": "string",
+              "default": "⚙️",
+              "description": "Emoji for methods",
+              "examples": [
+                "⚙️",
+                "🔧",
+                "🛠️",
+                "⚒️",
+                "🔩",
+                "🎛️",
+                "🕹️",
+                "🎮"
+              ]
+            },
+            "function": {
+              "type": "string",
+              "default": "🔧",
+              "description": "Emoji for functions",
+              "examples": [
+                "🔧",
+                "⚙️",
+                "🛠️",
+                "🎯",
+                "📐",
+                "🧮",
+                "💻",
+                "🖥️"
+              ]
+            },
+            "getter": {
+              "type": "string",
+              "default": "📤",
+              "description": "Emoji for getters",
+              "examples": [
+                "📤",
+                "📡",
+                "🔍",
+                "👁️",
+                "📊",
+                "📈",
+                "🎯",
+                "🔎"
+              ]
+            },
+            "setter": {
+              "type": "string",
+              "default": "📥",
+              "description": "Emoji for setters",
+              "examples": [
+                "📥",
+                "📨",
+                "✏️",
+                "✍️",
+                "📝",
+                "💾",
+                "🖊️",
+                "✒️"
+              ]
+            },
+            "class": {
+              "type": "string",
+              "default": "📦",
+              "description": "Emoji for classes",
+              "examples": [
+                "📦",
+                "🏗️",
+                "🏢",
+                "🏭",
+                "📚",
+                "🎁",
+                "📋",
+                "🗃️"
+              ]
+            },
+            "interface": {
+              "type": "string",
+              "default": "📋",
+              "description": "Emoji for interfaces",
+              "examples": [
+                "📋",
+                "📄",
+                "📜",
+                "📝",
+                "🗒️",
+                "📑",
+                "🧾",
+                "📊"
+              ]
+            }
+          },
+          "additionalProperties": true,
+          "description": "Emoji icons for outline symbols, visibility, and modifiers."
+        },
+        "tsOutlineEnhancer.fontAwesomeSettings": {
+          "type": "object",
+          "default": {
+            "public": "fas fa-globe",
+            "private": "fas fa-lock",
+            "protected": "fas fa-shield-alt",
+            "static": "fas fa-thumbtack",
+            "readonly": "fas fa-book-open",
+            "abstract": "fas fa-theater-masks",
+            "async": "fas fa-bolt",
+            "export": "fas fa-share-square",
+            "default": "fas fa-star",
+            "constructor": "fas fa-hammer",
+            "property": "fas fa-tag",
+            "method": "fas fa-cog",
+            "function": "fas fa-wrench",
+            "getter": "fas fa-download",
+            "setter": "fas fa-upload",
+            "class": "fas fa-cube",
+            "interface": "fas fa-clipboard-list",
+            "heading": "fas fa-heading",
+            "variable": "fas fa-cube",
+            "constant": "fas fa-lock",
+            "enum": "fas fa-list-ol",
+            "enumMember": "fas fa-circle",
+            "module": "fas fa-folder",
+            "namespace": "fas fa-folder-open",
+            "typeAlias": "fas fa-tag",
+            "file": "fas fa-file",
+            "object": "fas fa-shapes",
+            "array": "fas fa-list",
+            "key": "fas fa-key",
+            "event": "fas fa-bolt",
+            "operator": "fas fa-plus",
+            "typeParameter": "fas fa-font"
+          },
+          "properties": {
+            "public": {
+              "type": "string",
+              "default": "fas fa-globe",
+              "description": "FontAwesome class for public members",
+              "examples": [
+                "fas fa-globe",
+                "fas fa-unlock",
+                "far fa-eye",
+                "fas fa-users",
+                "fas fa-broadcast-tower"
+              ]
+            },
+            "private": {
+              "type": "string",
+              "default": "fas fa-lock",
+              "description": "FontAwesome class for private members",
+              "examples": [
+                "fas fa-lock",
+                "fas fa-user-secret",
+                "far fa-eye-slash",
+                "fas fa-key",
+                "fas fa-ban"
+              ]
+            },
+            "protected": {
+              "type": "string",
+              "default": "fas fa-shield-alt",
+              "description": "FontAwesome class for protected members",
+              "examples": [
+                "fas fa-shield-alt",
+                "fas fa-exclamation-triangle",
+                "fas fa-shield-virus",
+                "fas fa-user-shield"
+              ]
+            },
+            "static": {
+              "type": "string",
+              "default": "fas fa-thumbtack",
+              "description": "FontAwesome class for static members",
+              "examples": [
+                "fas fa-thumbtack",
+                "fas fa-anchor",
+                "fas fa-paperclip",
+                "fas fa-map-pin"
+              ]
+            },
+            "readonly": {
+              "type": "string",
+              "default": "fas fa-book-open",
+              "description": "FontAwesome class for readonly members",
+              "examples": [
+                "fas fa-book-open",
+                "far fa-eye",
+                "fas fa-search",
+                "fas fa-glasses",
+                "fas fa-book"
+              ]
+            },
+            "abstract": {
+              "type": "string",
+              "default": "fas fa-theater-masks",
+              "description": "FontAwesome class for abstract members",
+              "examples": [
+                "fas fa-theater-masks",
+                "fas fa-ghost",
+                "fas fa-magic",
+                "fas fa-cloud",
+                "fas fa-puzzle-piece"
+              ]
+            },
+            "async": {
+              "type": "string",
+              "default": "fas fa-bolt",
+              "description": "FontAwesome class for async members",
+              "examples": [
+                "fas fa-bolt",
+                "fas fa-rocket",
+                "fas fa-spinner",
+                "fas fa-clock",
+                "fas fa-sync"
+              ]
+            },
+            "export": {
+              "type": "string",
+              "default": "fas fa-share-square",
+              "description": "FontAwesome class for exported members",
+              "examples": [
+                "fas fa-share-square",
+                "fas fa-external-link-alt",
+                "fas fa-upload",
+                "fas fa-paper-plane"
+              ]
+            },
+            "default": {
+              "type": "string",
+              "default": "fas fa-star",
+              "description": "FontAwesome class for default exports",
+              "examples": [
+                "fas fa-star",
+                "fas fa-crown",
+                "fas fa-gem",
+                "fas fa-trophy",
+                "fas fa-medal"
+              ]
+            },
+            "constructor": {
+              "type": "string",
+              "default": "fas fa-hammer",
+              "description": "FontAwesome class for constructors",
+              "examples": [
+                "fas fa-hammer",
+                "fas fa-tools",
+                "fas fa-wrench",
+                "fas fa-cogs",
+                "fas fa-industry"
+              ]
+            },
+            "property": {
+              "type": "string",
+              "default": "fas fa-tag",
+              "description": "FontAwesome class for properties",
+              "examples": [
+                "fas fa-tag",
+                "fas fa-tags",
+                "fas fa-file-alt",
+                "fas fa-clipboard",
+                "fas fa-sticky-note"
+              ]
+            },
+            "method": {
+              "type": "string",
+              "default": "fas fa-cog",
+              "description": "FontAwesome class for methods",
+              "examples": [
+                "fas fa-cog",
+                "fas fa-cogs",
+                "fas fa-tools",
+                "fas fa-wrench",
+                "fas fa-sliders-h"
+              ]
+            },
+            "function": {
+              "type": "string",
+              "default": "fas fa-wrench",
+              "description": "FontAwesome class for functions",
+              "examples": [
+                "fas fa-wrench",
+                "fas fa-cog",
+                "fas fa-tools",
+                "fas fa-calculator",
+                "fas fa-desktop"
+              ]
+            },
+            "getter": {
+              "type": "string",
+              "default": "fas fa-download",
+              "description": "FontAwesome class for getters",
+              "examples": [
+                "fas fa-download",
+                "fas fa-arrow-down",
+                "far fa-eye",
+                "fas fa-search",
+                "fas fa-chart-line"
+              ]
+            },
+            "setter": {
+              "type": "string",
+              "default": "fas fa-upload",
+              "description": "FontAwesome class for setters",
+              "examples": [
+                "fas fa-upload",
+                "fas fa-arrow-up",
+                "fas fa-edit",
+                "fas fa-pen",
+                "fas fa-save"
+              ]
+            },
+            "class": {
+              "type": "string",
+              "default": "fas fa-cube",
+              "description": "FontAwesome class for classes",
+              "examples": [
+                "fas fa-cube",
+                "fas fa-boxes",
+                "fas fa-building",
+                "fas fa-archive",
+                "fas fa-package"
+              ]
+            },
+            "interface": {
+              "type": "string",
+              "default": "fas fa-clipboard-list",
+              "description": "FontAwesome class for interfaces",
+              "examples": [
+                "fas fa-clipboard-list",
+                "fas fa-list-alt",
+                "fas fa-file-contract",
+                "fas fa-scroll",
+                "fas fa-clipboard"
+              ]
+            }
+          },
+          "additionalProperties": true,
+          "description": "Font Awesome class names for outline symbols, visibility, and modifiers."
+        },
+        "tsOutlineEnhancer.autoSelectCurrentElement": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically select the current element in outline when cursor moves in editor"
+        },
+        "tsOutlineEnhancer.autoRevealCurrentElement": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically reveal and focus TreeView when auto-select is active (prevents stealing focus from other panels)"
+        },
+        "tsOutlineEnhancer.sortMode": {
+          "type": "string",
+          "enum": [
+            "position",
+            "name",
+            "category"
+          ],
+          "default": "position",
+          "description": "Default sorting mode for outline elements",
+          "enumDescriptions": [
+            "Sort by position in source",
+            "Sort alphabetically by name",
+            "Sort by category (class, interface, heading, function, ...)"
+          ]
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "tsc -p ./ --noEmit",
+    "package": "vsce package",
+    "publish": "vsce publish",
+    "publish:package": "vsce package",
+    "publish:ovsx": "npx ovsx publish",
+    "publish:pre": "npm run compile && vsce publish"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "^18.19.0",
+    "@vscode/vsce": "^2.26.0",
+    "typescript": "^5.4.0"
+  },
+  "publisher": "ondery",
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
+  "keywords": [
+    "outline",
+    "typescript",
+    "javascript",
+    "jsx",
+    "tsx",
+    "markdown",
+    "symbols",
+    "navigation",
+    "webview",
+    "icons",
+    "json",
+    "jsonc"
+  ],
+  "homepage": "https://github.com/ondery/tsoutliner#readme",
+  "bugs": {
+    "url": "https://github.com/ondery/tsoutliner/issues"
+  },
+  "qna": "marketplace"
+}
