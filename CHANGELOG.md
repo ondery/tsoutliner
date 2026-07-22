@@ -5,19 +5,24 @@ All notable changes to **TS Outliner** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.2.0] - 2026-07-22
 
 ### Added
 
-- **Modern Lucide icon set** as the default (`iconType: modern`) — theme-aware line icons for toolbar and outline symbols
+- **Outline search** — fuzzy filter box (Fuse.js) replaces the OUTLINE header; searches all symbols and nested children, keeps ancestor context, and auto-expands matches
+- **Font Awesome** as the default icon set (`iconType: fontawesome`) with colorful per-symbol defaults
+- `fontAwesomeColors` for per-symbol Font Awesome colors (hex / named / CSS var), with color picker in Settings
+- **Modern Lucide icon set** (`iconType: modern`) — colorful line icons for outline symbols
 - `modernIconSettings` and `toolbarIconSettings` for per-action Iconify IDs (`lucide:name`)
+- `modernIconColors` for per-symbol Lucide icon colors
 - Bundled icon catalog under `media/icons/` with `npm run icons:catalog` regeneration
-- Commands: **Open Modern Icon Settings**, **Open Toolbar Icon Settings**
+- Commands: **Open Font Awesome Settings**, **Open Font Awesome Color Settings**, **Open Modern Icon Settings**, **Open Modern Icon Color Settings**, **Open Toolbar Icon Settings**
 
 ### Changed
 
 - Toolbar uses ghost buttons (no solid primary fill) that respect dark/light themes
 - Outline chevron and toolbar actions use SVG icons instead of emoji
+- Font family is configured only via Settings / command palette (Font button removed from toolbar)
 
 ## [0.1.0] - 2026-07-21
 

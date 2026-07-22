@@ -1,5 +1,5 @@
 {
-  "fontAwesome-solid-examples": {
+  "fontAwesome-defaults": {
     "public": "fas fa-globe",
     "private": "fas fa-lock",
     "protected": "fas fa-shield-alt",
@@ -16,7 +16,56 @@
     "getter": "fas fa-download",
     "setter": "fas fa-upload",
     "class": "fas fa-cube",
-    "interface": "fas fa-clipboard-list"
+    "interface": "fas fa-clipboard-list",
+    "heading": "fas fa-heading",
+    "variable": "fas fa-cube",
+    "constant": "fas fa-lock",
+    "enum": "fas fa-list-ol",
+    "enumMember": "fas fa-circle",
+    "module": "fas fa-folder",
+    "namespace": "fas fa-folder-open",
+    "typeAlias": "fas fa-tag",
+    "file": "fas fa-file",
+    "object": "fas fa-shapes",
+    "array": "fas fa-list",
+    "key": "fas fa-key",
+    "event": "fas fa-bolt",
+    "operator": "fas fa-plus",
+    "typeParameter": "fas fa-font"
+  },
+  "fontAwesome-colors": {
+    "public": "#22C55E",
+    "private": "#EF4444",
+    "protected": "#F59E0B",
+    "static": "#8B5CF6",
+    "readonly": "#06B6D4",
+    "abstract": "#A855F7",
+    "async": "#EAB308",
+    "export": "#3B82F6",
+    "default": "#FBBF24",
+    "constructor": "#F97316",
+    "property": "#38BDF8",
+    "method": "#C084FC",
+    "function": "#818CF8",
+    "getter": "#34D399",
+    "setter": "#FB7185",
+    "class": "#F59E0B",
+    "interface": "#60A5FA",
+    "heading": "#94A3B8",
+    "variable": "#67E8F9",
+    "constant": "#2DD4BF",
+    "enum": "#FB923C",
+    "enumMember": "#FCD34D",
+    "module": "#A78BFA",
+    "namespace": "#C4B5FD",
+    "typeAlias": "#4ADE80",
+    "file": "#94A3B8",
+    "object": "#F472B6",
+    "array": "#38BDF8",
+    "key": "#FBBF24",
+    "event": "#F87171",
+    "operator": "#A3E635",
+    "typeParameter": "#E879F9"
   },
   "fontAwesome-alternative-examples": {
     "public": "fas fa-unlock",
@@ -57,17 +106,17 @@
     "interface": "fas fa-scroll"
   },
   "usage": {
-    "description": "Bu dosya FontAwesome ikon örneklerini içerir. Kullanmak için:",
+    "description": "Font Awesome ikon setleri ve renkleri (varsayılan). Kullanmak için:",
     "steps": [
-      "1. VS Code ayarlarına git (Ctrl+,)",
-      "2. 'tsOutlineEnhancer.iconType' ayarını 'fontawesome' yap",
-      "3. 'tsOutlineEnhancer.fontAwesomeSettings' ayarına istediğin stil grubunu kopyala",
-      "4. FontAwesome fontunun sisteminde yüklü olduğundan emin ol"
+      "1. Settings'e git (Ctrl+,)",
+      "2. 'tsOutlineEnhancer.iconType' ayarını 'fontawesome' yap (varsayılan)",
+      "3. 'tsOutlineEnhancer.fontAwesomeSettings' içine istediğin grubu kopyala",
+      "4. Renkleri değiştirmek için 'tsOutlineEnhancer.fontAwesomeColors' kullan"
     ],
     "notes": [
-      "FontAwesome 6.4.0+ sürümü gerekli",
-      "Internet bağlantısı gerekli (CDN kullanılıyor)",
-      "Alternatif olarak local FontAwesome font kurabilirsin"
+      "Font Awesome Free paket eklenti içinde gömülü (CDN gerekmez)",
+      "İkonlar currentColor kullanır; fontAwesomeColors ile her varlık için renk atanır",
+      "Settings'te color picker ile renk seçilebilir"
     ]
   }
 }

@@ -5,8 +5,8 @@
     "url": "https://github.com/ondery"
   },
   "displayName": "TS Outliner",
-  "description": "Enhanced outline view for TypeScript, JavaScript, JSX, TSX, Markdown, and JSON with modern Lucide icons, fonts, and sorting.",
-  "version": "0.1.0",
+  "description": "Enhanced outline view for TypeScript, JavaScript, JSX, TSX, Markdown, and JSON with Font Awesome icons, fonts, and sorting.",
+  "version": "0.2.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -51,6 +51,21 @@
       {
         "command": "tsOutlineEnhancer.openModernIconSettings",
         "title": "Open Modern Icon Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.openModernIconColorSettings",
+        "title": "Open Modern Icon Color Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.openFontAwesomeSettings",
+        "title": "Open Font Awesome Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.openFontAwesomeColorSettings",
+        "title": "Open Font Awesome Color Settings",
         "category": "TS Outliner"
       },
       {
@@ -126,12 +141,12 @@
             "fontawesome",
             "none"
           ],
-          "default": "modern",
+          "default": "fontawesome",
           "description": "Icon style for outline symbols, visibility, and modifiers",
           "enumDescriptions": [
-            "Modern Lucide line icons (theme-aware, recommended)",
+            "Modern Lucide line icons with per-symbol colors",
             "Emoji icons (🌐, 🔒, etc.)",
-            "Font Awesome icons",
+            "Font Awesome icons with per-symbol colors (recommended)",
             "Don't show any icons"
           ]
         },
@@ -496,12 +511,244 @@
           "additionalProperties": true,
           "description": "Modern Lucide icon IDs for outline symbols (Iconify format: lucide:name). Pick any icon from the bundled catalog."
         },
+        "tsOutlineEnhancer.modernIconColors": {
+          "type": "object",
+          "default": {
+            "public": "#22C55E",
+            "private": "#EF4444",
+            "protected": "#F59E0B",
+            "static": "#8B5CF6",
+            "readonly": "#06B6D4",
+            "abstract": "#A855F7",
+            "async": "#EAB308",
+            "export": "#3B82F6",
+            "default": "#FBBF24",
+            "constructor": "#F97316",
+            "property": "#38BDF8",
+            "method": "#C084FC",
+            "function": "#818CF8",
+            "getter": "#34D399",
+            "setter": "#FB7185",
+            "class": "#F59E0B",
+            "interface": "#60A5FA",
+            "heading": "#94A3B8",
+            "variable": "#67E8F9",
+            "constant": "#2DD4BF",
+            "enum": "#FB923C",
+            "enumMember": "#FCD34D",
+            "module": "#A78BFA",
+            "namespace": "#C4B5FD",
+            "typeAlias": "#4ADE80",
+            "file": "#94A3B8",
+            "object": "#F472B6",
+            "array": "#38BDF8",
+            "key": "#FBBF24",
+            "event": "#F87171",
+            "operator": "#A3E635",
+            "typeParameter": "#E879F9"
+          },
+          "properties": {
+            "public": {
+              "type": "string",
+              "format": "color",
+              "default": "#22C55E",
+              "description": "Color for public modern icon (hex, named color, or CSS var)."
+            },
+            "private": {
+              "type": "string",
+              "format": "color",
+              "default": "#EF4444",
+              "description": "Color for private modern icon (hex, named color, or CSS var)."
+            },
+            "protected": {
+              "type": "string",
+              "format": "color",
+              "default": "#F59E0B",
+              "description": "Color for protected modern icon (hex, named color, or CSS var)."
+            },
+            "static": {
+              "type": "string",
+              "format": "color",
+              "default": "#8B5CF6",
+              "description": "Color for static modern icon (hex, named color, or CSS var)."
+            },
+            "readonly": {
+              "type": "string",
+              "format": "color",
+              "default": "#06B6D4",
+              "description": "Color for readonly modern icon (hex, named color, or CSS var)."
+            },
+            "abstract": {
+              "type": "string",
+              "format": "color",
+              "default": "#A855F7",
+              "description": "Color for abstract modern icon (hex, named color, or CSS var)."
+            },
+            "async": {
+              "type": "string",
+              "format": "color",
+              "default": "#EAB308",
+              "description": "Color for async modern icon (hex, named color, or CSS var)."
+            },
+            "export": {
+              "type": "string",
+              "format": "color",
+              "default": "#3B82F6",
+              "description": "Color for export modern icon (hex, named color, or CSS var)."
+            },
+            "default": {
+              "type": "string",
+              "format": "color",
+              "default": "#FBBF24",
+              "description": "Color for default modern icon (hex, named color, or CSS var)."
+            },
+            "constructor": {
+              "type": "string",
+              "format": "color",
+              "default": "#F97316",
+              "description": "Color for constructor modern icon (hex, named color, or CSS var)."
+            },
+            "property": {
+              "type": "string",
+              "format": "color",
+              "default": "#38BDF8",
+              "description": "Color for property modern icon (hex, named color, or CSS var)."
+            },
+            "method": {
+              "type": "string",
+              "format": "color",
+              "default": "#C084FC",
+              "description": "Color for method modern icon (hex, named color, or CSS var)."
+            },
+            "function": {
+              "type": "string",
+              "format": "color",
+              "default": "#818CF8",
+              "description": "Color for function modern icon (hex, named color, or CSS var)."
+            },
+            "getter": {
+              "type": "string",
+              "format": "color",
+              "default": "#34D399",
+              "description": "Color for getter modern icon (hex, named color, or CSS var)."
+            },
+            "setter": {
+              "type": "string",
+              "format": "color",
+              "default": "#FB7185",
+              "description": "Color for setter modern icon (hex, named color, or CSS var)."
+            },
+            "class": {
+              "type": "string",
+              "format": "color",
+              "default": "#F59E0B",
+              "description": "Color for class modern icon (hex, named color, or CSS var)."
+            },
+            "interface": {
+              "type": "string",
+              "format": "color",
+              "default": "#60A5FA",
+              "description": "Color for interface modern icon (hex, named color, or CSS var)."
+            },
+            "heading": {
+              "type": "string",
+              "format": "color",
+              "default": "#94A3B8",
+              "description": "Color for heading modern icon (hex, named color, or CSS var)."
+            },
+            "variable": {
+              "type": "string",
+              "format": "color",
+              "default": "#67E8F9",
+              "description": "Color for variable modern icon (hex, named color, or CSS var)."
+            },
+            "constant": {
+              "type": "string",
+              "format": "color",
+              "default": "#2DD4BF",
+              "description": "Color for constant modern icon (hex, named color, or CSS var)."
+            },
+            "enum": {
+              "type": "string",
+              "format": "color",
+              "default": "#FB923C",
+              "description": "Color for enum modern icon (hex, named color, or CSS var)."
+            },
+            "enumMember": {
+              "type": "string",
+              "format": "color",
+              "default": "#FCD34D",
+              "description": "Color for enumMember modern icon (hex, named color, or CSS var)."
+            },
+            "module": {
+              "type": "string",
+              "format": "color",
+              "default": "#A78BFA",
+              "description": "Color for module modern icon (hex, named color, or CSS var)."
+            },
+            "namespace": {
+              "type": "string",
+              "format": "color",
+              "default": "#C4B5FD",
+              "description": "Color for namespace modern icon (hex, named color, or CSS var)."
+            },
+            "typeAlias": {
+              "type": "string",
+              "format": "color",
+              "default": "#4ADE80",
+              "description": "Color for typeAlias modern icon (hex, named color, or CSS var)."
+            },
+            "file": {
+              "type": "string",
+              "format": "color",
+              "default": "#94A3B8",
+              "description": "Color for file modern icon (hex, named color, or CSS var)."
+            },
+            "object": {
+              "type": "string",
+              "format": "color",
+              "default": "#F472B6",
+              "description": "Color for object modern icon (hex, named color, or CSS var)."
+            },
+            "array": {
+              "type": "string",
+              "format": "color",
+              "default": "#38BDF8",
+              "description": "Color for array modern icon (hex, named color, or CSS var)."
+            },
+            "key": {
+              "type": "string",
+              "format": "color",
+              "default": "#FBBF24",
+              "description": "Color for key modern icon (hex, named color, or CSS var)."
+            },
+            "event": {
+              "type": "string",
+              "format": "color",
+              "default": "#F87171",
+              "description": "Color for event modern icon (hex, named color, or CSS var)."
+            },
+            "operator": {
+              "type": "string",
+              "format": "color",
+              "default": "#A3E635",
+              "description": "Color for operator modern icon (hex, named color, or CSS var)."
+            },
+            "typeParameter": {
+              "type": "string",
+              "format": "color",
+              "default": "#E879F9",
+              "description": "Color for typeParameter modern icon (hex, named color, or CSS var)."
+            }
+          },
+          "additionalProperties": true,
+          "description": "Colors for modern Lucide outline icons. Each key matches modernIconSettings (e.g. class, method, private)."
+        },
         "tsOutlineEnhancer.toolbarIconSettings": {
           "type": "object",
           "default": {
             "refresh": "lucide:refresh-cw",
             "collapseAll": "lucide:fold-vertical",
-            "font": "lucide:type",
             "sortPosition": "lucide:map-pin",
             "sortName": "lucide:arrow-down-a-z",
             "sortCategory": "lucide:layers",
@@ -526,16 +773,6 @@
                 "lucide:fold-vertical",
                 "lucide:folder-minus",
                 "lucide:list-tree"
-              ]
-            },
-            "font": {
-              "type": "string",
-              "default": "lucide:type",
-              "description": "Iconify ID for font button (e.g. lucide:box). Must exist in the bundled catalog.",
-              "examples": [
-                "lucide:type",
-                "lucide:case-sensitive",
-                "lucide:a-large-small"
               ]
             },
             "sortPosition": {
@@ -1268,6 +1505,239 @@
           "additionalProperties": true,
           "description": "Font Awesome class names for outline symbols, visibility, and modifiers."
         },
+        "tsOutlineEnhancer.fontAwesomeColors": {
+          "type": "object",
+          "default": {
+            "public": "#22C55E",
+            "private": "#EF4444",
+            "protected": "#F59E0B",
+            "static": "#8B5CF6",
+            "readonly": "#06B6D4",
+            "abstract": "#A855F7",
+            "async": "#EAB308",
+            "export": "#3B82F6",
+            "default": "#FBBF24",
+            "constructor": "#F97316",
+            "property": "#38BDF8",
+            "method": "#C084FC",
+            "function": "#818CF8",
+            "getter": "#34D399",
+            "setter": "#FB7185",
+            "class": "#F59E0B",
+            "interface": "#60A5FA",
+            "heading": "#94A3B8",
+            "variable": "#67E8F9",
+            "constant": "#2DD4BF",
+            "enum": "#FB923C",
+            "enumMember": "#FCD34D",
+            "module": "#A78BFA",
+            "namespace": "#C4B5FD",
+            "typeAlias": "#4ADE80",
+            "file": "#94A3B8",
+            "object": "#F472B6",
+            "array": "#38BDF8",
+            "key": "#FBBF24",
+            "event": "#F87171",
+            "operator": "#A3E635",
+            "typeParameter": "#E879F9"
+          },
+          "properties": {
+            "public": {
+              "type": "string",
+              "format": "color",
+              "default": "#22C55E",
+              "description": "Color for public Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "private": {
+              "type": "string",
+              "format": "color",
+              "default": "#EF4444",
+              "description": "Color for private Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "protected": {
+              "type": "string",
+              "format": "color",
+              "default": "#F59E0B",
+              "description": "Color for protected Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "static": {
+              "type": "string",
+              "format": "color",
+              "default": "#8B5CF6",
+              "description": "Color for static Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "readonly": {
+              "type": "string",
+              "format": "color",
+              "default": "#06B6D4",
+              "description": "Color for readonly Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "abstract": {
+              "type": "string",
+              "format": "color",
+              "default": "#A855F7",
+              "description": "Color for abstract Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "async": {
+              "type": "string",
+              "format": "color",
+              "default": "#EAB308",
+              "description": "Color for async Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "export": {
+              "type": "string",
+              "format": "color",
+              "default": "#3B82F6",
+              "description": "Color for export Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "default": {
+              "type": "string",
+              "format": "color",
+              "default": "#FBBF24",
+              "description": "Color for default Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "constructor": {
+              "type": "string",
+              "format": "color",
+              "default": "#F97316",
+              "description": "Color for constructor Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "property": {
+              "type": "string",
+              "format": "color",
+              "default": "#38BDF8",
+              "description": "Color for property Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "method": {
+              "type": "string",
+              "format": "color",
+              "default": "#C084FC",
+              "description": "Color for method Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "function": {
+              "type": "string",
+              "format": "color",
+              "default": "#818CF8",
+              "description": "Color for function Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "getter": {
+              "type": "string",
+              "format": "color",
+              "default": "#34D399",
+              "description": "Color for getter Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "setter": {
+              "type": "string",
+              "format": "color",
+              "default": "#FB7185",
+              "description": "Color for setter Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "class": {
+              "type": "string",
+              "format": "color",
+              "default": "#F59E0B",
+              "description": "Color for class Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "interface": {
+              "type": "string",
+              "format": "color",
+              "default": "#60A5FA",
+              "description": "Color for interface Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "heading": {
+              "type": "string",
+              "format": "color",
+              "default": "#94A3B8",
+              "description": "Color for heading Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "variable": {
+              "type": "string",
+              "format": "color",
+              "default": "#67E8F9",
+              "description": "Color for variable Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "constant": {
+              "type": "string",
+              "format": "color",
+              "default": "#2DD4BF",
+              "description": "Color for constant Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "enum": {
+              "type": "string",
+              "format": "color",
+              "default": "#FB923C",
+              "description": "Color for enum Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "enumMember": {
+              "type": "string",
+              "format": "color",
+              "default": "#FCD34D",
+              "description": "Color for enumMember Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "module": {
+              "type": "string",
+              "format": "color",
+              "default": "#A78BFA",
+              "description": "Color for module Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "namespace": {
+              "type": "string",
+              "format": "color",
+              "default": "#C4B5FD",
+              "description": "Color for namespace Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "typeAlias": {
+              "type": "string",
+              "format": "color",
+              "default": "#4ADE80",
+              "description": "Color for typeAlias Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "file": {
+              "type": "string",
+              "format": "color",
+              "default": "#94A3B8",
+              "description": "Color for file Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "object": {
+              "type": "string",
+              "format": "color",
+              "default": "#F472B6",
+              "description": "Color for object Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "array": {
+              "type": "string",
+              "format": "color",
+              "default": "#38BDF8",
+              "description": "Color for array Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "key": {
+              "type": "string",
+              "format": "color",
+              "default": "#FBBF24",
+              "description": "Color for key Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "event": {
+              "type": "string",
+              "format": "color",
+              "default": "#F87171",
+              "description": "Color for event Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "operator": {
+              "type": "string",
+              "format": "color",
+              "default": "#A3E635",
+              "description": "Color for operator Font Awesome icon (hex, named color, or CSS var)."
+            },
+            "typeParameter": {
+              "type": "string",
+              "format": "color",
+              "default": "#E879F9",
+              "description": "Color for typeParameter Font Awesome icon (hex, named color, or CSS var)."
+            }
+          },
+          "additionalProperties": true,
+          "description": "Colors for Font Awesome outline icons. Each key matches fontAwesomeSettings (e.g. class, method, private)."
+        },
         "tsOutlineEnhancer.autoSelectCurrentElement": {
           "type": "boolean",
           "default": false,
@@ -1309,8 +1779,8 @@
     "publish:pre": "npm run compile && vsce publish"
   },
   "devDependencies": {
-    "@types/vscode": "^1.74.0",
     "@types/node": "^18.19.0",
+    "@types/vscode": "^1.74.0",
     "@vscode/vsce": "^2.26.0",
     "typescript": "^5.4.0"
   },
@@ -1338,5 +1808,8 @@
   "bugs": {
     "url": "https://github.com/ondery/tsoutliner/issues"
   },
-  "qna": "marketplace"
+  "qna": "marketplace",
+  "dependencies": {
+    "fuse.js": "^6.6.2"
+  }
 }

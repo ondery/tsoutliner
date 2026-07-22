@@ -1,6 +1,6 @@
 {
     // 1. İkon Türü Seçimi
-    "tsOutlineEnhancer.iconType": "modern", // "modern", "emoji", "fontawesome", "none"
+    "tsOutlineEnhancer.iconType": "fontawesome", // "fontawesome", "modern", "emoji", "none"
     // 2. Font Family Ayarları
     "tsOutlineEnhancer.fontFamily": "Fira Code, JetBrains Mono, Consolas, monospace",
     "tsOutlineEnhancer.fontSize": 14,
@@ -9,23 +9,43 @@
     "tsOutlineEnhancer.iconSize": 16,
     "tsOutlineEnhancer.iconSpacing": 4,
     "tsOutlineEnhancer.iconToTextSpacing": 6,
-    // 4. Modern Lucide ikonları (iconType: "modern" — varsayılan)
+    // 4. Font Awesome ikonları (iconType: "fontawesome" — varsayılan)
+    "tsOutlineEnhancer.fontAwesomeSettings": {
+        "class": "fas fa-cube",
+        "method": "fas fa-cog",
+        "function": "fas fa-wrench",
+        "private": "fas fa-lock"
+    },
+    // 5. Font Awesome renkleri (her varlık için CSS rengi)
+    "tsOutlineEnhancer.fontAwesomeColors": {
+        "class": "#F59E0B",
+        "method": "#C084FC",
+        "function": "#818CF8",
+        "private": "#EF4444"
+    },
+    // 6. Modern Lucide ikonları (iconType: "modern")
     "tsOutlineEnhancer.modernIconSettings": {
         "class": "lucide:box",
         "method": "lucide:cog",
         "function": "lucide:square-function",
         "private": "lucide:lock"
     },
-    // 5. Toolbar ikonları
+    // 7. Modern ikon renkleri
+    "tsOutlineEnhancer.modernIconColors": {
+        "class": "#F59E0B",
+        "method": "#C084FC",
+        "function": "#818CF8",
+        "private": "#EF4444"
+    },
+    // 8. Toolbar ikonları
     "tsOutlineEnhancer.toolbarIconSettings": {
         "refresh": "lucide:refresh-cw",
         "collapseAll": "lucide:fold-vertical",
-        "font": "lucide:type",
         "sortPosition": "lucide:map-pin",
         "sortName": "lucide:arrow-down-a-z",
         "sortCategory": "lucide:layers"
     },
-    // 6. Emoji Ayarları (iconType: "emoji" için)
+    // 9. Emoji Ayarları (iconType: "emoji" için)
     "tsOutlineEnhancer.emojiSettings": {
         "public": "🟢",
         "private": "🔴",
@@ -45,28 +65,7 @@
         "class": "📦",
         "interface": "📋"
     },
-    // 7. FontAwesome Ayarları (iconType: "fontawesome" için)
-    "tsOutlineEnhancer.fontAwesomeSettings": {
-        "public": "fas fa-globe",
-        "private": "fas fa-lock",
-        "protected": "fas fa-shield-alt",
-        "static": "fas fa-thumbtack",
-        "readonly": "fas fa-book-open",
-        "abstract": "fas fa-theater-masks",
-        "async": "fas fa-bolt",
-        "export": "fas fa-share-square",
-        "default": "fas fa-star",
-        "constructor": "fas fa-hammer",
-        "property": "fas fa-tag",
-        "method": "fas fa-cog",
-        "function": "fas fa-wrench",
-        "getter": "fas fa-download",
-
-        "setter": "fas fa-upload",
-        "class": "fas fa-cube",
-        "interface": "fas fa-clipboard-list"
-    },
-    // 6. Diğer Ayarlar
+    // 10. Diğer Ayarlar
     "tsOutlineEnhancer.showIconsInLabel": true,
     "tsOutlineEnhancer.showVisibilityInLabel": false,
     "tsOutlineEnhancer.autoSelectCurrentElement": false,

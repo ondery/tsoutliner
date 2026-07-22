@@ -1,5 +1,7 @@
 import { ICON_CATALOG, resolveIconSvg } from "./catalog";
 import {
+  DEFAULT_FONTAWESOME_ICONS,
+  DEFAULT_ICON_COLORS,
   DEFAULT_MODERN_ICONS,
   DEFAULT_TOOLBAR_ICONS,
 } from "./defaults";
@@ -12,6 +14,9 @@ export {
 } from "./catalog";
 
 export {
+  DEFAULT_FONTAWESOME_ICONS,
+  DEFAULT_ICON_COLORS,
+  DEFAULT_MODERN_ICON_COLORS,
   DEFAULT_MODERN_ICONS,
   DEFAULT_TOOLBAR_ICONS,
   MODERN_ICON_EXAMPLES,
@@ -61,6 +66,8 @@ export function serializeIconCatalog(): string {
 export function serializeDefaults(): string {
   return JSON.stringify({
     modern: DEFAULT_MODERN_ICONS,
+    fontawesome: DEFAULT_FONTAWESOME_ICONS,
+    colors: DEFAULT_ICON_COLORS,
     toolbar: DEFAULT_TOOLBAR_ICONS,
   });
 }

@@ -15,6 +15,9 @@ export class WebViewTemplateManager {
         const fontAwesomeUri = webview.asWebviewUri(
             vscode.Uri.joinPath(extensionUri, "media", "fontawesome", "css", "all.min.css")
         );
+        const fuseUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(extensionUri, "media", "lib", "fuse.min.js")
+        );
         const nonce = this.getNonce();
 
         return `<!DOCTYPE html>
@@ -23,7 +26,7 @@ export class WebViewTemplateManager {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TS Outliner</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; script-src 'nonce-${nonce}' ${webview.cspSource};">
     <link rel="stylesheet" href="${fontAwesomeUri}">
     <style>
         ${this.getStyles()}
@@ -35,6 +38,7 @@ export class WebViewTemplateManager {
         ${this.getContentHTML()}
     </div>
     
+    <script nonce="${nonce}" src="${fuseUri}"></script>
     <script nonce="${nonce}">
         ${this.getJavaScript()}
     </script>
@@ -143,15 +147,66 @@ export class WebViewTemplateManager {
             margin-bottom: var(--spacing-md);
         }
 
-        .section-header {
-            font-size: 0.8em; /* Relative to container font size */
-            font-weight: 600;
-            color: var(--vscode-descriptionForeground);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            padding: var(--spacing-xs) var(--spacing-sm);
+        .outline-search {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 var(--spacing-sm) var(--spacing-xs);
             margin-bottom: var(--spacing-xs);
             border-bottom: 1px solid var(--vscode-panel-border);
+        }
+
+        .outline-search-input {
+            flex: 1;
+            min-width: 0;
+            height: 24px;
+            padding: 2px 8px;
+            border: 1px solid var(--vscode-input-border, transparent);
+            border-radius: 3px;
+            background: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            font-family: inherit;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .outline-search-input::placeholder {
+            color: var(--vscode-input-placeholderForeground, var(--vscode-descriptionForeground));
+        }
+
+        .outline-search-input:focus {
+            border-color: var(--vscode-focusBorder);
+        }
+
+        .outline-search-input::-webkit-search-cancel-button {
+            display: none;
+        }
+
+        .outline-search-clear {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            padding: 0;
+            border: none;
+            border-radius: 3px;
+            background: transparent;
+            color: var(--vscode-icon-foreground, var(--vscode-descriptionForeground));
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.75;
+        }
+
+        .outline-search-clear.visible {
+            display: inline-flex;
+        }
+
+        .outline-search-clear:hover {
+            background: var(--vscode-toolbar-hoverBackground);
+            opacity: 1;
         }
 
         /* Toolbar buttons — ghost style, theme-aware (dark/light) */
@@ -543,10 +598,6 @@ export class WebViewTemplateManager {
                 <span class="btn-icon" data-toolbar-icon="collapseAll" aria-hidden="true"></span>
                 <span class="btn-label">Collapse All</span>
             </button>
-            <button class="btn" id="select-font-btn" title="Select Font Family">
-                <span class="btn-icon" data-toolbar-icon="font" aria-hidden="true"></span>
-                <span class="btn-label">Font</span>
-            </button>
             <div class="toolbar-divider" role="separator" aria-hidden="true"></div>
             <div class="sort-combo" id="sort-combo">
                 <button type="button" class="btn sort-combo-trigger" id="sort-combo-trigger" title="Sort by: Position" aria-haspopup="listbox" aria-expanded="false" aria-controls="sort-combo-menu">
@@ -578,7 +629,18 @@ export class WebViewTemplateManager {
         return `
         <div class="content">
             <div class="outline-section">
-                <div class="section-header">OUTLINE</div>
+                <div class="outline-search">
+                    <input
+                        type="search"
+                        id="outline-search-input"
+                        class="outline-search-input"
+                        placeholder="Search outline…"
+                        aria-label="Search outline"
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
+                    <button type="button" id="outline-search-clear" class="outline-search-clear" title="Clear search" aria-label="Clear search">×</button>
+                </div>
                 <div id="outline-container" class="outline-container">
                     <div class="empty-state">Loading...</div>
                 </div>
@@ -611,6 +673,7 @@ export class WebViewTemplateManager {
                 this.collapsedStateKey = 'ts-outliner-collapsed-state';
                 this.settings = this.getDefaultSettings();
                 this.languageId = '';
+                this.searchQuery = '';
             }
 
             getDefaultSettings() {
@@ -649,43 +712,12 @@ export class WebViewTemplateManager {
                         "operator": "➗",
                         "typeParameter": "Ｔ"
                     },
-                    fontAwesomeSettings: {
-                        "public": "fas fa-globe",
-                        "private": "fas fa-lock",
-                        "protected": "fas fa-shield-alt",
-                        "static": "fas fa-thumbtack",
-                        "readonly": "fas fa-book-open",
-                        "abstract": "fas fa-theater-masks",
-                        "async": "fas fa-bolt",
-                        "export": "fas fa-share-square",
-                        "default": "fas fa-star",
-                        "constructor": "fas fa-hammer",
-                        "property": "fas fa-tag",
-                        "method": "fas fa-cog",
-                        "function": "fas fa-wrench",
-                        "getter": "fas fa-download",
-                        "setter": "fas fa-upload",
-                        "class": "fas fa-cube",
-                        "interface": "fas fa-clipboard-list",
-                        "heading": "fas fa-heading",
-                        "variable": "fas fa-cube",
-                        "constant": "fas fa-lock",
-                        "enum": "fas fa-list-ol",
-                        "enumMember": "fas fa-circle",
-                        "module": "fas fa-folder",
-                        "namespace": "fas fa-folder-open",
-                        "typeAlias": "fas fa-tag",
-                        "file": "fas fa-file",
-                        "object": "fas fa-shapes",
-                        "array": "fas fa-list",
-                        "key": "fas fa-key",
-                        "event": "fas fa-bolt",
-                        "operator": "fas fa-plus",
-                        "typeParameter": "fas fa-font"
-                    },
+                    fontAwesomeSettings: { ...ICON_DEFAULTS.fontawesome },
+                    fontAwesomeColors: { ...ICON_DEFAULTS.colors },
                     modernIconSettings: { ...ICON_DEFAULTS.modern },
+                    modernIconColors: { ...ICON_DEFAULTS.colors },
                     toolbarIconSettings: { ...ICON_DEFAULTS.toolbar },
-                    iconType: "modern",
+                    iconType: "fontawesome",
                     fontFamily: "Consolas, 'Courier New', monospace",
                     fontSize: 13,
                     lineHeight: 1.2,
@@ -709,6 +741,15 @@ export class WebViewTemplateManager {
                 this.render();
             }
 
+            setSearchQuery(query) {
+                this.searchQuery = typeof query === 'string' ? query : '';
+                const clearBtn = document.getElementById('outline-search-clear');
+                if (clearBtn) {
+                    clearBtn.classList.toggle('visible', this.searchQuery.length > 0);
+                }
+                this.render();
+            }
+
             setSortMode(mode) {
                 this.sortMode = mode;
                 this.updateToolbar();
@@ -722,6 +763,14 @@ export class WebViewTemplateManager {
                     modernIconSettings: {
                         ...defaults.modernIconSettings,
                         ...(newSettings.modernIconSettings || {})
+                    },
+                    modernIconColors: {
+                        ...defaults.modernIconColors,
+                        ...(newSettings.modernIconColors || {})
+                    },
+                    fontAwesomeColors: {
+                        ...defaults.fontAwesomeColors,
+                        ...(newSettings.fontAwesomeColors || {})
                     },
                     toolbarIconSettings: {
                         ...defaults.toolbarIconSettings,
@@ -894,6 +943,117 @@ export class WebViewTemplateManager {
                 return \`\${currentPath}[\${node.type}]\`;
             }
 
+            flattenNodesForSearch(nodes, parentPath = '', ancestorKeys = []) {
+                const items = [];
+                for (const node of nodes || []) {
+                    const key = this.getNodeKey(node, parentPath);
+                    const currentPath = parentPath ? \`\${parentPath}.\${node.name}\` : node.name;
+                    items.push({
+                        key,
+                        name: node.name || '',
+                        type: node.type || '',
+                        displayName: NodeRenderer.getNodeDisplayName(node),
+                        line: node.line,
+                        ancestorKeys: ancestorKeys.slice()
+                    });
+                    if (node.children && node.children.length > 0) {
+                        items.push(
+                            ...this.flattenNodesForSearch(
+                                node.children,
+                                currentPath,
+                                ancestorKeys.concat(key)
+                            )
+                        );
+                    }
+                }
+                return items;
+            }
+
+            filterNodes(nodes, query) {
+                const q = (query || '').trim();
+                if (!q) {
+                    return { nodes, forceExpand: false };
+                }
+
+                if (typeof Fuse === 'undefined') {
+                    // Fallback: simple case-insensitive includes
+                    const lower = q.toLowerCase();
+                    const matchKeys = new Set();
+                    const collect = (list, parentPath = '', ancestors = []) => {
+                        for (const node of list || []) {
+                            const key = this.getNodeKey(node, parentPath);
+                            const currentPath = parentPath ? \`\${parentPath}.\${node.name}\` : node.name;
+                            const haystack = \`\${node.name} \${node.type} \${NodeRenderer.getNodeDisplayName(node)}\`.toLowerCase();
+                            if (haystack.includes(lower)) {
+                                matchKeys.add(key);
+                                ancestors.forEach(k => matchKeys.add(k));
+                            }
+                            if (node.children && node.children.length) {
+                                collect(node.children, currentPath, ancestors.concat(key));
+                            }
+                        }
+                    };
+                    collect(nodes);
+                    return {
+                        nodes: this.pruneNodesByKeys(nodes, matchKeys),
+                        forceExpand: true
+                    };
+                }
+
+                const flat = this.flattenNodesForSearch(nodes);
+                const fuse = new Fuse(flat, {
+                    keys: [
+                        { name: 'name', weight: 0.7 },
+                        { name: 'displayName', weight: 0.2 },
+                        { name: 'type', weight: 0.1 }
+                    ],
+                    threshold: 0.35,
+                    ignoreLocation: true,
+                    includeScore: true,
+                    minMatchCharLength: 1
+                });
+
+                const results = fuse.search(q);
+                const visibleKeys = new Set();
+                for (const result of results) {
+                    visibleKeys.add(result.item.key);
+                    for (const ancestorKey of result.item.ancestorKeys) {
+                        visibleKeys.add(ancestorKey);
+                    }
+                }
+
+                return {
+                    nodes: this.pruneNodesByKeys(nodes, visibleKeys),
+                    forceExpand: true
+                };
+            }
+
+            pruneNodesByKeys(nodes, visibleKeys, parentPath = '') {
+                const result = [];
+                for (const node of nodes || []) {
+                    const key = this.getNodeKey(node, parentPath);
+                    if (!visibleKeys.has(key)) {
+                        continue;
+                    }
+                    const currentPath = parentPath ? \`\${parentPath}.\${node.name}\` : node.name;
+                    const clone = {
+                        name: node.name,
+                        type: node.type,
+                        visibility: node.visibility,
+                        modifiers: node.modifiers,
+                        line: node.line
+                    };
+                    if (node.children && node.children.length > 0) {
+                        const children = this.pruneNodesByKeys(node.children, visibleKeys, currentPath);
+                        if (children.length > 0) {
+                            clone.children = children;
+                        }
+                    }
+                    result.push(clone);
+                }
+                return result;
+            }
+
             render() {
                 const container = document.getElementById('outline-container');
                 
@@ -910,19 +1070,26 @@ export class WebViewTemplateManager {
                     return;
                 }
 
+                const { nodes: visibleNodes, forceExpand } = this.filterNodes(this.nodes, this.searchQuery);
+
+                if (!visibleNodes || visibleNodes.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No matching symbols</div>';
+                    return;
+                }
+
                 // Mevcut collapsed state'leri al
                 const collapsedStates = this.getCollapsedStates();
                 
                 container.innerHTML = '';
-                this.nodes.forEach(node => {
-                    container.appendChild(NodeRenderer.render(node, 0, '', collapsedStates));
+                visibleNodes.forEach(node => {
+                    container.appendChild(NodeRenderer.render(node, 0, '', collapsedStates, forceExpand));
                 });
             }
         }
 
         // Node Rendering
         class NodeRenderer {
-            static render(node, level = 0, parentPath = '', collapsedStates = {}) {
+            static render(node, level = 0, parentPath = '', collapsedStates = {}, forceExpand = false) {
                 const nodeElement = document.createElement('div');
                 nodeElement.className = 'node';
                 
@@ -946,7 +1113,7 @@ export class WebViewTemplateManager {
                 content.innerHTML = \`
                     \${hasChildren ? \`<span class="chevron">\${IconManager.getChevronIcon()}</span>\` : '<span style="width: 0.875rem;"></span>'}
                     <div class="features">
-                        \${state.settings.showIconsInLabel && state.settings.iconType !== 'none' ? \`<span class="\${IconManager.getIconClass()}" data-tooltip="\${NodeRenderer.getTypeTooltip(node)}">\${IconManager.getTypeIcon(node.type)}</span>\` : ''}
+                        \${state.settings.showIconsInLabel && state.settings.iconType !== 'none' ? \`<span class="\${IconManager.getIconClass()}"\${IconManager.getIconColorAttr(node.type)} data-tooltip="\${NodeRenderer.getTypeTooltip(node)}">\${IconManager.getTypeIcon(node.type)}</span>\` : ''}
                         \${NodeRenderer.getFeatureIcons(node)}
                     </div>
                     <span class="node-name">\${NodeRenderer.getNodeDisplayName(node)}</span>
@@ -1000,7 +1167,8 @@ export class WebViewTemplateManager {
                     
                     // Saved state'e göre collapsed durumunu ayarla
                     // Default olarak collapsed, eğer açık olarak kaydedildiyse expanded yap
-                    const isExpanded = collapsedStates[nodeKey] === false; // false = expanded, true/undefined = collapsed
+                    // Arama aktifken eşleşen dalları açık tut
+                    const isExpanded = forceExpand || collapsedStates[nodeKey] === false;
                     childrenContainer.className = isExpanded ? 'node-children' : 'node-children collapsed';
                     
                     // Chevron'u da duruma göre ayarla
@@ -1010,7 +1178,9 @@ export class WebViewTemplateManager {
                     }
                     
                     node.children.forEach(child => {
-                        childrenContainer.appendChild(NodeRenderer.render(child, level + 1, currentPath, collapsedStates));
+                        childrenContainer.appendChild(
+                            NodeRenderer.render(child, level + 1, currentPath, collapsedStates, forceExpand)
+                        );
                     });
                     
                     nodeElement.appendChild(childrenContainer);
@@ -1057,7 +1227,7 @@ export class WebViewTemplateManager {
                     const iconClass = IconManager.getFeatureIconClass();
                     const visibilityName = node.visibility.charAt(0).toUpperCase() + node.visibility.slice(1);
                     const tooltip = state.settings.showTooltipPrefixes ? \`Visibility: \${visibilityName}\` : visibilityName;
-                    features.push(\`<span class="\${iconClass} tooltip" data-tooltip="\${tooltip}">\${visIcon}</span>\`);
+                    features.push(\`<span class="\${iconClass} tooltip"\${IconManager.getIconColorAttr(node.visibility)} data-tooltip="\${tooltip}">\${visIcon}</span>\`);
                 }
                 
                 // Modifiers - duplicate kontrolü ile
@@ -1071,7 +1241,7 @@ export class WebViewTemplateManager {
                         if (defaultIcon) {
                             const iconClass = IconManager.getFeatureIconClass();
                             const tooltip = state.settings.showTooltipPrefixes ? 'Modifier: Export Default' : 'Export Default';
-                            features.push(\`<span class="\${iconClass} tooltip" data-tooltip="\${tooltip}">\${defaultIcon}</span>\`);
+                            features.push(\`<span class="\${iconClass} tooltip"\${IconManager.getIconColorAttr('default')} data-tooltip="\${tooltip}">\${defaultIcon}</span>\`);
                         }
                         addedModifiers.add('export');
                         addedModifiers.add('default');
@@ -1085,7 +1255,7 @@ export class WebViewTemplateManager {
                                 const iconClass = IconManager.getFeatureIconClass();
                                 const modifierName = mod.charAt(0).toUpperCase() + mod.slice(1);
                                 const tooltip = state.settings.showTooltipPrefixes ? \`Modifier: \${modifierName}\` : modifierName;
-                                features.push(\`<span class="\${iconClass} tooltip" data-tooltip="\${tooltip}">\${icon}</span>\`);
+                                features.push(\`<span class="\${iconClass} tooltip"\${IconManager.getIconColorAttr(mod)} data-tooltip="\${tooltip}">\${icon}</span>\`);
                                 addedModifiers.add(mod);
                             }
                         }
@@ -1134,6 +1304,34 @@ export class WebViewTemplateManager {
                 return 'feature-icon';
             }
 
+            static getIconColor(key) {
+                let colors = {};
+                if (state.settings.iconType === 'modern') {
+                    colors = state.settings.modernIconColors || {};
+                } else if (state.settings.iconType === 'fontawesome') {
+                    colors = state.settings.fontAwesomeColors || {};
+                } else {
+                    return '';
+                }
+                const color = (colors[key] || (ICON_DEFAULTS.colors && ICON_DEFAULTS.colors[key]) || '').trim();
+                if (!color) {
+                    return '';
+                }
+                // Reject values that could break out of the style attribute
+                if (/[;"'<>\\\\]/.test(color)) {
+                    return '';
+                }
+                return color;
+            }
+
+            static getIconColorAttr(key) {
+                if (state.settings.iconType !== 'modern' && state.settings.iconType !== 'fontawesome') {
+                    return '';
+                }
+                const color = IconManager.getIconColor(key);
+                return color ? \` style="color: \${color}"\` : '';
+            }
+
             static getModernSvg(key) {
                 const iconId = resolveIconId(
                     key,
@@ -1157,7 +1355,8 @@ export class WebViewTemplateManager {
                     return IconManager.getModernSvg(type);
                 }
                 if (state.settings.iconType === 'fontawesome') {
-                    const faClass = state.settings.fontAwesomeSettings[type];
+                    const faClass = state.settings.fontAwesomeSettings[type]
+                        || (ICON_DEFAULTS.fontawesome && ICON_DEFAULTS.fontawesome[type]);
                     return faClass ? \`<i class="\${faClass}"></i>\` : '<i class="fas fa-question"></i>';
                 }
                 if (state.settings.iconType === 'emoji') {
@@ -1174,7 +1373,8 @@ export class WebViewTemplateManager {
                     return IconManager.getModernSvg(visibility);
                 }
                 if (state.settings.iconType === 'fontawesome') {
-                    const faClass = state.settings.fontAwesomeSettings[visibility];
+                    const faClass = state.settings.fontAwesomeSettings[visibility]
+                        || (ICON_DEFAULTS.fontawesome && ICON_DEFAULTS.fontawesome[visibility]);
                     return faClass ? \`<i class="\${faClass}"></i>\` : '';
                 }
                 if (state.settings.iconType === 'emoji') {
@@ -1188,7 +1388,8 @@ export class WebViewTemplateManager {
                     return IconManager.getModernSvg(modifier);
                 }
                 if (state.settings.iconType === 'fontawesome') {
-                    const faClass = state.settings.fontAwesomeSettings[modifier];
+                    const faClass = state.settings.fontAwesomeSettings[modifier]
+                        || (ICON_DEFAULTS.fontawesome && ICON_DEFAULTS.fontawesome[modifier]);
                     return faClass ? \`<i class="\${faClass}"></i>\` : '';
                 }
                 if (state.settings.iconType === 'emoji') {
@@ -1241,9 +1442,38 @@ export class WebViewTemplateManager {
             Utils.collapseAll();
         });
 
-        document.getElementById('select-font-btn').addEventListener('click', () => {
-            vscode.postMessage({ type: 'selectFont' });
-        });
+        // Outline search (Fuse.js)
+        const searchInput = document.getElementById('outline-search-input');
+        const searchClearBtn = document.getElementById('outline-search-clear');
+        let searchDebounceTimer;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = setTimeout(() => {
+                    state.setSearchQuery(searchInput.value);
+                }, 120);
+            });
+
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    searchInput.value = '';
+                    state.setSearchQuery('');
+                    searchInput.blur();
+                }
+            });
+        }
+
+        if (searchClearBtn) {
+            searchClearBtn.addEventListener('click', () => {
+                if (searchInput) {
+                    searchInput.value = '';
+                    searchInput.focus();
+                }
+                state.setSearchQuery('');
+            });
+        }
 
         // Sort icon combobox
         const sortCombo = document.getElementById('sort-combo');

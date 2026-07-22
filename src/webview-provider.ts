@@ -61,9 +61,6 @@ export class OutlineWebviewProvider implements vscode.WebviewViewProvider {
         case "refresh":
           await this.refresh();
           break;
-        case "selectFont":
-          await vscode.commands.executeCommand("tsOutlineEnhancer.selectFont");
-          break;
         default:
           console.error(`Unknown message type: ${message.type}`);
       }
@@ -127,9 +124,11 @@ export class OutlineWebviewProvider implements vscode.WebviewViewProvider {
       settings: {
         emojiSettings: config.get("emojiSettings", {}),
         fontAwesomeSettings: config.get("fontAwesomeSettings", {}),
+        fontAwesomeColors: config.get("fontAwesomeColors", {}),
         modernIconSettings: config.get("modernIconSettings", {}),
+        modernIconColors: config.get("modernIconColors", {}),
         toolbarIconSettings: config.get("toolbarIconSettings", {}),
-        iconType: config.get("iconType", "modern"),
+        iconType: config.get("iconType", "fontawesome"),
         fontFamily: config.get(
           "fontFamily",
           "Consolas, 'Courier New', monospace"

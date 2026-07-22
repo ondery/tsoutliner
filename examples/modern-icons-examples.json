@@ -33,6 +33,40 @@
     "operator": "lucide:plus",
     "typeParameter": "lucide:baseline"
   },
+  "modern-colors": {
+    "public": "#22C55E",
+    "private": "#EF4444",
+    "protected": "#F59E0B",
+    "static": "#8B5CF6",
+    "readonly": "#06B6D4",
+    "abstract": "#A855F7",
+    "async": "#EAB308",
+    "export": "#3B82F6",
+    "default": "#FBBF24",
+    "constructor": "#F97316",
+    "property": "#38BDF8",
+    "method": "#C084FC",
+    "function": "#818CF8",
+    "getter": "#34D399",
+    "setter": "#FB7185",
+    "class": "#F59E0B",
+    "interface": "#60A5FA",
+    "heading": "#94A3B8",
+    "variable": "#67E8F9",
+    "constant": "#2DD4BF",
+    "enum": "#FB923C",
+    "enumMember": "#FCD34D",
+    "module": "#A78BFA",
+    "namespace": "#C4B5FD",
+    "typeAlias": "#4ADE80",
+    "file": "#94A3B8",
+    "object": "#F472B6",
+    "array": "#38BDF8",
+    "key": "#FBBF24",
+    "event": "#F87171",
+    "operator": "#A3E635",
+    "typeParameter": "#E879F9"
+  },
   "modern-minimal": {
     "public": "lucide:circle",
     "private": "lucide:lock",
@@ -70,7 +104,6 @@
   "toolbar-defaults": {
     "refresh": "lucide:refresh-cw",
     "collapseAll": "lucide:fold-vertical",
-    "font": "lucide:type",
     "sortPosition": "lucide:map-pin",
     "sortName": "lucide:arrow-down-a-z",
     "sortCategory": "lucide:layers",
@@ -79,24 +112,25 @@
   "toolbar-alternate": {
     "refresh": "lucide:infinity",
     "collapseAll": "lucide:folder-minus",
-    "font": "lucide:case-sensitive",
     "sortPosition": "lucide:list-ordered",
     "sortName": "lucide:a-large-small",
     "sortCategory": "lucide:list-tree",
     "chevron": "lucide:plus"
   },
   "usage": {
-    "description": "Modern Lucide ikon setleri. Kullanmak için:",
+    "description": "Modern Lucide ikon setleri ve renkleri. Kullanmak için:",
     "steps": [
       "1. Settings'e git (Ctrl+,)",
       "2. 'tsOutlineEnhancer.iconType' ayarını 'modern' yap",
       "3. 'tsOutlineEnhancer.modernIconSettings' veya 'toolbarIconSettings' içine istediğin grubu kopyala",
-      "4. İkon ID formatı: lucide:name (ör. lucide:box)"
+      "4. Renkleri değiştirmek için 'tsOutlineEnhancer.modernIconColors' kullan",
+      "5. İkon ID formatı: lucide:name (ör. lucide:box)"
     ],
     "notes": [
       "Sadece eklenti kataloğundaki Lucide ikonları desteklenir",
       "Yeni ikon eklemek için media/icons altına SVG koyup scripts/generate-icon-catalog.js çalıştır",
-      "İkonlar currentColor kullanır; dark/light temaya otomatik uyum sağlar"
+      "İkonlar currentColor kullanır; modernIconColors ile her varlık için renk atanır",
+      "Font ailesi toolbar'dan değil Settings → Font Family üzerinden ayarlanır"
     ]
   }
 }

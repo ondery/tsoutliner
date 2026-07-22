@@ -35,6 +35,18 @@ export function activate(context: vscode.ExtensionContext): void {
       () => openSettings("modernIconSettings")
     ),
     vscode.commands.registerCommand(
+      "tsOutlineEnhancer.openModernIconColorSettings",
+      () => openSettings("modernIconColors")
+    ),
+    vscode.commands.registerCommand(
+      "tsOutlineEnhancer.openFontAwesomeSettings",
+      () => openSettings("fontAwesomeSettings")
+    ),
+    vscode.commands.registerCommand(
+      "tsOutlineEnhancer.openFontAwesomeColorSettings",
+      () => openSettings("fontAwesomeColors")
+    ),
+    vscode.commands.registerCommand(
       "tsOutlineEnhancer.openToolbarIconSettings",
       () => openSettings("toolbarIconSettings")
     ),
