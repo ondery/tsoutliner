@@ -5,8 +5,8 @@
     "url": "https://github.com/ondery"
   },
   "displayName": "TS Outliner",
-  "description": "Enhanced outline view for TypeScript, JavaScript, JSX, TSX, Markdown, and JSON with Font Awesome icons, fonts, and sorting.",
-  "version": "0.2.0",
+  "description": "Enhanced outline view for TypeScript, JavaScript, JSX, TSX, CSS, Markdown, and JSON with Font Awesome icons, fonts, and sorting.",
+  "version": "0.3.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -24,10 +24,14 @@
     "onLanguage:typescriptreact",
     "onLanguage:javascript",
     "onLanguage:javascriptreact",
+    "onLanguage:css",
+    "onLanguage:scss",
+    "onLanguage:less",
     "onLanguage:markdown",
     "onLanguage:json",
     "onLanguage:jsonc",
-    "onView:tsOutlineEnhancer.webview"
+    "onView:tsOutlineEnhancer.webview",
+    "onCommand:tsOutlineEnhancer.toggleEditorOutline"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -108,8 +112,44 @@
         "command": "tsOutlineEnhancer.sortByCategory",
         "title": "Sort By: Category",
         "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.toggleEditorOutline",
+        "title": "Toggle Editor Outline",
+        "category": "TS Outliner",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "tsOutlineEnhancer.showEditorOutline",
+        "title": "Show Editor Outline",
+        "category": "TS Outliner",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "tsOutlineEnhancer.hideEditorOutline",
+        "title": "Hide Editor Outline",
+        "category": "TS Outliner",
+        "icon": "$(close)"
       }
     ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "tsOutlineEnhancer.toggleEditorOutline",
+          "when": "resourceLangId =~ /typescript|typescriptreact|javascript|javascriptreact|css|scss|less|markdown|json|jsonc/",
+          "group": "navigation@90"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "tsOutlineEnhancer.showEditorOutline"
+        },
+        {
+          "command": "tsOutlineEnhancer.hideEditorOutline",
+          "when": "tsOutlineEnhancer.editorOutlineOpen"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [
         {
@@ -1762,6 +1802,18 @@
             "Sort alphabetically by name",
             "Sort by category (class, interface, heading, function, ...)"
           ]
+        },
+        "tsOutlineEnhancer.editorOutlineEnabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show the outline panel beside the editor (minimap-style, no separate file tab workflow). Toggle via the editor title List Tree button or command palette."
+        },
+        "tsOutlineEnhancer.editorOutlineWidth": {
+          "type": "number",
+          "default": 280,
+          "minimum": 160,
+          "maximum": 600,
+          "description": "Approximate width in pixels of the editor-adjacent outline panel."
         }
       }
     }
@@ -1796,6 +1848,9 @@
     "javascript",
     "jsx",
     "tsx",
+    "css",
+    "scss",
+    "less",
     "markdown",
     "symbols",
     "navigation",

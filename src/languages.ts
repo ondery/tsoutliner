@@ -7,6 +7,9 @@ export const SUPPORTED_LANGUAGE_IDS = [
   "typescriptreact",
   "javascript",
   "javascriptreact",
+  "css",
+  "scss",
+  "less",
   "markdown",
   "json",
   "jsonc",
@@ -29,6 +32,14 @@ export function isCodeLanguage(languageId: string): boolean {
   );
 }
 
+export function isCssLanguage(languageId: string): boolean {
+  return (
+    languageId === "css" ||
+    languageId === "scss" ||
+    languageId === "less"
+  );
+}
+
 export function isMarkdownLanguage(languageId: string): boolean {
   return languageId === "markdown";
 }
@@ -47,6 +58,12 @@ export function languageDisplayName(languageId: string): string {
       return "JavaScript";
     case "javascriptreact":
       return "JSX";
+    case "css":
+      return "CSS";
+    case "scss":
+      return "SCSS";
+    case "less":
+      return "Less";
     case "markdown":
       return "Markdown";
     case "json":

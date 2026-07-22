@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import {
   isCodeLanguage,
+  isCssLanguage,
   isJsonLanguage,
   isMarkdownLanguage,
   isSupportedLanguage,
@@ -14,7 +15,7 @@ import {
 
 /**
  * Parses the active editor into an outline tree using document symbols (LSP)
- * with language-aware fallbacks for TypeScript/JavaScript, Markdown, and JSON.
+ * with language-aware fallbacks for TypeScript/JavaScript, CSS, Markdown, and JSON.
  */
 export class OutlineParser {
   async parseActiveFile(): Promise<OutlineNode[]> {
@@ -22,24 +23,31 @@ export class OutlineParser {
     if (!editor || !isSupportedLanguage(editor.document.languageId)) {
       return [];
     }
+    return this.parseDocument(editor.document);
+  }
 
-    const languageId = editor.document.languageId;
+  async parseDocument(document: vscode.TextDocument): Promise<OutlineNode[]> {
+    if (!isSupportedLanguage(document.languageId)) {
+      return [];
+    }
+
+    const languageId = document.languageId;
 
     try {
       const symbols = (await vscode.commands.executeCommand(
         "vscode.executeDocumentSymbolProvider",
-        editor.document.uri
+        document.uri
       )) as vscode.DocumentSymbol[] | undefined;
 
       if (!symbols || symbols.length === 0) {
-        return this.fallbackParse(editor.document);
+        return this.fallbackParse(document);
       }
 
       const nodes = await this.convertSymbolsToNodes(symbols, languageId);
       return nodes.filter((node): node is OutlineNode => node !== null);
     } catch (error) {
       console.error("Error getting document symbols:", error);
-      return this.fallbackParse(editor.document);
+      return this.fallbackParse(document);
     }
   }
 
@@ -126,6 +134,39 @@ export class OutlineParser {
           return "key";
         default:
           return "key";
+      }
+    }
+
+    if (isCssLanguage(languageId)) {
+      switch (kind) {
+        case vscode.SymbolKind.Class:
+        case vscode.SymbolKind.Interface:
+        case vscode.SymbolKind.Struct:
+          return "class";
+        case vscode.SymbolKind.Method:
+        case vscode.SymbolKind.Function:
+          return "function";
+        case vscode.SymbolKind.Property:
+        case vscode.SymbolKind.Field:
+        case vscode.SymbolKind.Key:
+          return "property";
+        case vscode.SymbolKind.Variable:
+        case vscode.SymbolKind.Constant:
+          return "variable";
+        case vscode.SymbolKind.Module:
+        case vscode.SymbolKind.Namespace:
+        case vscode.SymbolKind.Package:
+        case vscode.SymbolKind.Object:
+          return "module";
+        case vscode.SymbolKind.Enum:
+        case vscode.SymbolKind.EnumMember:
+          return "enum";
+        case vscode.SymbolKind.Event:
+          return "event";
+        case vscode.SymbolKind.Operator:
+          return "operator";
+        default:
+          return "property";
       }
     }
 
@@ -228,7 +269,11 @@ export class OutlineParser {
     symbol: vscode.DocumentSymbol,
     languageId: string
   ): Promise<{ visibility: Visibility; modifiers: Modifier[] }> {
-    if (isMarkdownLanguage(languageId) || isJsonLanguage(languageId)) {
+    if (
+      isMarkdownLanguage(languageId) ||
+      isJsonLanguage(languageId) ||
+      isCssLanguage(languageId)
+    ) {
       return { visibility: "none", modifiers: [] };
     }
 
@@ -346,10 +391,91 @@ export class OutlineParser {
     if (isJsonLanguage(document.languageId)) {
       return this.fallbackJsonParsing(document);
     }
+    if (isCssLanguage(document.languageId)) {
+      return this.fallbackCssParsing(document);
+    }
     if (isCodeLanguage(document.languageId)) {
       return this.fallbackCodeParsing(document);
     }
     return [];
+  }
+
+  /**
+   * Fallback CSS/SCSS/Less outline when document symbols are unavailable.
+   * Captures at-rules and selectors that open a block.
+   */
+  private fallbackCssParsing(document: vscode.TextDocument): OutlineNode[] {
+    const text = document.getText();
+    const nodes: OutlineNode[] = [];
+    const rootStack: { indent: number; node: OutlineNode }[] = [];
+
+    const lines = text.split(/\r?\n/);
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      if (
+        !trimmed ||
+        trimmed.startsWith("//") ||
+        trimmed.startsWith("/*") ||
+        trimmed.startsWith("*") ||
+        trimmed.startsWith("}")
+      ) {
+        continue;
+      }
+
+      // Selector or at-rule followed by { on same or next lines
+      const blockMatch = trimmed.match(
+        /^((?:@[a-zA-Z-]+[^{;]*|[^{;@}]+))\s*\{?\s*$/
+      );
+      if (!blockMatch) {
+        continue;
+      }
+
+      let name = blockMatch[1].trim();
+      if (!name || name === "{" || /^[;:]$/.test(name)) {
+        continue;
+      }
+      // Skip bare property declarations (color: red)
+      if (/^[\w-]+\s*:/.test(name) && !name.startsWith("@") && !name.includes("&")) {
+        continue;
+      }
+
+      const indent = line.search(/\S/);
+      const isAtRule = name.startsWith("@");
+      const node: OutlineNode = {
+        name: name.length > 80 ? name.slice(0, 77) + "…" : name,
+        type: isAtRule ? "module" : name.startsWith("--") ? "variable" : "class",
+        visibility: "none",
+        modifiers: [],
+        line: i,
+      };
+
+      while (rootStack.length > 0 && rootStack[rootStack.length - 1].indent >= indent) {
+        rootStack.pop();
+      }
+
+      if (rootStack.length === 0) {
+        nodes.push(node);
+      } else {
+        const parent = rootStack[rootStack.length - 1].node;
+        if (!parent.children) {
+          parent.children = [];
+        }
+        parent.children.push(node);
+      }
+
+      if (trimmed.includes("{") || /\{\s*$/.test(trimmed)) {
+        rootStack.push({ indent, node });
+      } else {
+        // Peek ahead for { on following line
+        const next = lines[i + 1]?.trim() ?? "";
+        if (next.startsWith("{")) {
+          rootStack.push({ indent, node });
+        }
+      }
+    }
+
+    return nodes;
   }
 
   /**

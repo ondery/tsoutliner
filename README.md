@@ -1,18 +1,19 @@
 # TS Outliner
 
-Enhanced outline view for **TypeScript**, **JavaScript**, **JSX**, **TSX**, **Markdown**, and **JSON** in Visual Studio Code.
+Enhanced outline view for **TypeScript**, **JavaScript**, **JSX**, **TSX**, **CSS**, **Markdown**, and **JSON** in Visual Studio Code.
 
-Uses VS Code’s built-in document symbol providers for accurate structure, then adds customizable icons, fonts, sorting, and one-click navigation in a dedicated Activity Bar panel.
+Uses VS Code’s built-in document symbol providers for accurate structure, then adds customizable icons, fonts, sorting, and one-click navigation in a dedicated Activity Bar panel — or beside the editor like a minimap.
 
 ![TS Outliner icon](https://raw.githubusercontent.com/ondery/tsoutliner/master/media/icon.png)
 
 ## Features
 
-- **Multi-language outline** — TypeScript, JavaScript, JSX, TSX, Markdown headings, and JSON trees
+- **Multi-language outline** — TypeScript, JavaScript, JSX, TSX, CSS/SCSS/Less, Markdown headings, and JSON trees
 - **LSP-backed symbols** — Uses `executeDocumentSymbolProvider` with smart text fallbacks
 - **Visibility & modifiers** — Public / private / protected, static, async, export, and more (code languages)
 - **Icon styles** — Colorful Font Awesome by default; Lucide modern icons, emoji, or none
 - **Fuzzy search** — Filter the outline (including nested symbols) with Fuse.js
+- **Editor outline** — Toggle a minimap-style panel beside the editor (width configurable)
 - **Typography controls** — Font family picker, size, and line height
 - **Sorting** — By position, name, or category
 - **Navigation** — Click to jump; double-click to select the full symbol range
@@ -26,6 +27,9 @@ Uses VS Code’s built-in document symbol providers for accurate structure, then
 | TSX        | `typescriptreact`     | Same as TypeScript + React components    |
 | JavaScript | `javascript`          | Classes, functions, variables…           |
 | JSX        | `javascriptreact`     | Same as JavaScript + React components    |
+| CSS        | `css`                 | Selectors, at-rules, nested rules        |
+| SCSS       | `scss`                | Same as CSS + nesting / partials         |
+| Less       | `less`                | Same as CSS + Less constructs            |
 | Markdown   | `markdown`            | Nested headings (`#` … `######`)         |
 | JSON       | `json`                | Nested objects, arrays, and keys         |
 | JSONC      | `jsonc`               | Same as JSON (comments allowed)          |
@@ -57,6 +61,7 @@ Sample files live in [`examples/`](examples/).
 | **TS Outliner: Sort By: Position / Name / Category** | Change sort order |
 | **TS Outliner: Open Settings** | Open all extension settings |
 | **TS Outliner: Open Emoji / Icon / Font Settings** | Jump to specific setting groups |
+| **TS Outliner: Toggle Editor Outline** | Show/hide minimap-style outline beside the editor |
 | **TS Outliner: Open Font Awesome Settings** | Customize Font Awesome outline icons |
 | **TS Outliner: Open Font Awesome Color Settings** | Customize Font Awesome icon colors |
 | **TS Outliner: Open Modern Icon Settings** | Customize Lucide outline icons |
@@ -75,6 +80,8 @@ All settings live under `tsOutlineEnhancer.*`. Notable options:
 | `tsOutlineEnhancer.modernIconSettings` | (object) | Lucide icon IDs per symbol (`lucide:box`, …) |
 | `tsOutlineEnhancer.modernIconColors` | (object) | Per-symbol colors for modern icons (`#F59E0B`, …) |
 | `tsOutlineEnhancer.toolbarIconSettings` | (object) | Lucide icon IDs for toolbar actions |
+| `tsOutlineEnhancer.editorOutlineEnabled` | `false` | Show outline beside the editor |
+| `tsOutlineEnhancer.editorOutlineWidth` | `280` | Editor outline width in pixels (160–600) |
 | `tsOutlineEnhancer.fontFamily` | Consolas… | Outline panel font |
 | `tsOutlineEnhancer.fontSize` | `13` | Font size (px) |
 | `tsOutlineEnhancer.sortMode` | `position` | Default sort mode |
@@ -84,6 +91,10 @@ All settings live under `tsOutlineEnhancer.*`. Notable options:
 | `tsOutlineEnhancer.showVisibilityInLabel` | `false` | Append `[public]` etc. to labels |
 
 Open **Settings → Extensions → TS Outliner**, or run **TS Outliner: Open Settings**.
+
+### Editor outline
+
+Use the **list-tree** button in the editor title bar, or run **TS Outliner: Toggle Editor Outline**, to open a panel beside the current editor (no Activity Bar required). Width is controlled by `editorOutlineWidth`.
 
 ### Font Awesome (default)
 

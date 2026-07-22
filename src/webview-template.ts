@@ -481,11 +481,13 @@ export class WebViewTemplateManager {
             align-items: center;
         }
 
-        /* Visibility Styling */
-        .visibility-none { border-left: 2px solid transparent; }
-        .visibility-public { border-left: 2px solid #10b981; }
-        .visibility-private { border-left: 2px solid #ef4444; }
-        .visibility-protected { border-left: 2px solid #f59e0b; }
+        /* Visibility: icons carry meaning — no colored left border (uniform tree for all languages) */
+        .visibility-none,
+        .visibility-public,
+        .visibility-private,
+        .visibility-protected {
+            border-left: none;
+        }
 
         /* Modifier Styling */
         .modifier-static .node-name { font-weight: 600; }
@@ -503,66 +505,34 @@ export class WebViewTemplateManager {
             opacity: 0.9;
         }
 
-        /* Tooltip */
+        /* Tooltip — positioned via JS (viewport-aware) */
         .tooltip {
             position: relative;
         }
 
-        /* Hover'da satırı ve ikonu öne al — sonraki kardeşler tooltip'i örtmesin */
-        .tooltip:hover {
-            z-index: 1000;
-        }
-
-        .node:has(.tooltip:hover),
-        .node-content:has(.tooltip:hover) {
-            position: relative;
-            z-index: 1000;
-        }
-
-        .tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            top: 50%;
-            left: 0px; /* Icon'un sol hizasına yerleştir */
-            transform: translateY(-130%); /* Dikey olarak ortala */
-            background-color: var(--vscode-editorHoverWidget-background);
-            color: var(--vscode-editorHoverWidget-foreground);
+        #outline-tooltip {
+            position: fixed;
+            z-index: 10000;
+            max-width: min(280px, calc(100vw - 16px));
             padding: var(--spacing-xs) var(--spacing-sm);
             border-radius: var(--border-radius);
-            font-size: var(--tooltip-font-size); /* Use tooltip font size setting */
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            z-index: 1001;
+            font-size: var(--tooltip-font-size);
+            line-height: 1.3;
+            background-color: var(--vscode-editorHoverWidget-background);
+            color: var(--vscode-editorHoverWidget-foreground);
             border: 1px solid var(--vscode-editorHoverWidget-border);
-            min-width: max-content;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.12s ease;
+            white-space: normal;
+            word-break: break-word;
         }
 
-        /* Tooltip'in sağ tarafa taştığı durumlarda sol tarafa göster */
-        .tooltip::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            right: calc(100% + 0px);
-            transform: translateY(0%);
-            width: 0;
-            height: 0;
-            pointer-events: none;
-            opacity: 0;
-            z-index: 1000;
-        }
-        
-        .tooltip:hover::after {
+        #outline-tooltip.visible {
             opacity: 1;
-        }
-        
-        /* Container'ın sağ kenarına yakın tooltip'ler için alternatif pozisyon */
-        @media (max-width: 400px) {
-            .tooltip::after {
-                left: auto;
-                right: calc(100% + 8px);
-            }
+            visibility: visible;
         }
 
         /* Scrollbar */
@@ -646,6 +616,7 @@ export class WebViewTemplateManager {
                 </div>
             </div>
         </div>
+        <div id="outline-tooltip" role="tooltip" aria-hidden="true"></div>
     `;
     }
     /**
@@ -1059,10 +1030,10 @@ export class WebViewTemplateManager {
                 
                 if (!this.nodes || this.nodes.length === 0) {
                     const lang = this.languageId || '';
-                    const supported = ['typescript','typescriptreact','javascript','javascriptreact','markdown','json','jsonc'];
+                    const supported = ['typescript','typescriptreact','javascript','javascriptreact','markdown','json','jsonc','css','scss','less'];
                     let message = 'No symbols found';
                     if (!lang) {
-                        message = 'Open a TypeScript, JavaScript, JSX, TSX, Markdown, or JSON file';
+                        message = 'Open a TypeScript, JavaScript, JSX, TSX, CSS, Markdown, or JSON file';
                     } else if (!supported.includes(lang)) {
                         message = 'This language is not supported yet';
                     }
@@ -1531,6 +1502,82 @@ export class WebViewTemplateManager {
                     break;
             }
         });
+
+        // Viewport-aware floating tooltip (stays fully visible in narrow panels)
+        (function setupFloatingTooltip() {
+            const tip = document.getElementById('outline-tooltip');
+            if (!tip) {
+                return;
+            }
+
+            let hideTimer;
+
+            function hideTip() {
+                tip.classList.remove('visible');
+                tip.setAttribute('aria-hidden', 'true');
+            }
+
+            function showTip(target) {
+                const text = target.getAttribute('data-tooltip');
+                if (!text) {
+                    return;
+                }
+                clearTimeout(hideTimer);
+                tip.textContent = text;
+                tip.classList.add('visible');
+                tip.setAttribute('aria-hidden', 'false');
+
+                const margin = 8;
+                const rect = target.getBoundingClientRect();
+                const tipRect = tip.getBoundingClientRect();
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+
+                let left = rect.left;
+                let top = rect.top - tipRect.height - 6;
+
+                if (top < margin) {
+                    top = rect.bottom + 6;
+                }
+                if (top + tipRect.height > vh - margin) {
+                    top = Math.max(margin, vh - tipRect.height - margin);
+                }
+
+                if (left + tipRect.width > vw - margin) {
+                    left = vw - tipRect.width - margin;
+                }
+                if (left < margin) {
+                    left = margin;
+                }
+
+                tip.style.left = left + 'px';
+                tip.style.top = top + 'px';
+            }
+
+            document.addEventListener('mouseover', (e) => {
+                const target = e.target && e.target.closest
+                    ? e.target.closest('[data-tooltip]')
+                    : null;
+                if (target && target.getAttribute('data-tooltip')) {
+                    showTip(target);
+                }
+            });
+
+            document.addEventListener('mouseout', (e) => {
+                const from = e.target && e.target.closest
+                    ? e.target.closest('[data-tooltip]')
+                    : null;
+                const to = e.relatedTarget && e.relatedTarget.closest
+                    ? e.relatedTarget.closest('[data-tooltip]')
+                    : null;
+                if (from && from !== to) {
+                    hideTimer = setTimeout(hideTip, 80);
+                }
+            });
+
+            document.addEventListener('scroll', hideTip, true);
+            window.addEventListener('resize', hideTip);
+        })();
 
         // Apply initial styles and toolbar icons
         state.updateFontStyles();

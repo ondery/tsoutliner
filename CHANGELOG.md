@@ -5,6 +5,21 @@ All notable changes to **TS Outliner** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-07-22
+
+### Added
+
+- **Editor outline panel** — minimap-style outline beside the active editor (toggle via editor title button or **Toggle Editor Outline**)
+- Settings: `editorOutlineEnabled`, `editorOutlineWidth` (160–600px)
+- **CSS / SCSS / Less** language support (document symbols + fallback selector/at-rule parser)
+- Fuzzy outline search (Fuse.js) across all symbols and nested children
+
+### Changed
+
+- Tooltips use a viewport-aware floating bubble so they stay fully visible in narrow panels
+- Unified tree styling for all languages (removed visibility-colored left borders on TS/JS nodes)
+- Font Awesome remains the default colorful icon set
+
 ## [0.2.0] - 2026-07-22
 
 ### Added

@@ -7,6 +7,10 @@ import { OutlineWebviewProvider } from "./webview-provider";
 export function activate(context: vscode.ExtensionContext): void {
   const webviewProvider = new OutlineWebviewProvider(context.extensionUri);
 
+  if (vscode.window.activeTextEditor) {
+    webviewProvider.trackCodeEditor(vscode.window.activeTextEditor);
+  }
+
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       OutlineWebviewProvider.viewType,
@@ -77,24 +81,51 @@ export function activate(context: vscode.ExtensionContext): void {
       async () => {
         await selectFontFamily(webviewProvider);
       }
+    ),
+    vscode.commands.registerCommand(
+      "tsOutlineEnhancer.toggleEditorOutline",
+      async () => {
+        await webviewProvider.toggleEditorOutline();
+      }
+    ),
+    vscode.commands.registerCommand(
+      "tsOutlineEnhancer.showEditorOutline",
+      async () => {
+        await webviewProvider.showEditorOutline();
+      }
+    ),
+    vscode.commands.registerCommand(
+      "tsOutlineEnhancer.hideEditorOutline",
+      async () => {
+        await webviewProvider.hideEditorOutline();
+      }
     )
   );
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((event) => {
-      if (event.affectsConfiguration(CONFIG_SECTION)) {
-        void webviewProvider.refresh();
+      if (!event.affectsConfiguration(CONFIG_SECTION)) {
+        return;
       }
+      if (
+        event.affectsConfiguration(`${CONFIG_SECTION}.editorOutlineEnabled`) ||
+        event.affectsConfiguration(`${CONFIG_SECTION}.editorOutlineWidth`)
+      ) {
+        void webviewProvider.syncEditorOutlineFromConfig();
+      }
+      void webviewProvider.refresh();
     }),
-    vscode.window.onDidChangeActiveTextEditor(() => {
+    vscode.window.onDidChangeActiveTextEditor((editor) => {
+      webviewProvider.trackCodeEditor(editor);
       void webviewProvider.refresh();
     }),
     vscode.workspace.onDidChangeTextDocument((event) => {
+      const tracked = isSupportedLanguage(event.document.languageId);
       const activeEditor = vscode.window.activeTextEditor;
       if (
-        activeEditor &&
-        event.document === activeEditor.document &&
-        isSupportedLanguage(event.document.languageId)
+        tracked &&
+        (activeEditor?.document === event.document ||
+          webviewProvider.isEditorOutlineOpen())
       ) {
         webviewProvider.scheduleRefresh(500);
       }
@@ -107,12 +138,19 @@ export function activate(context: vscode.ExtensionContext): void {
       if (!isSupportedLanguage(event.textEditor.document.languageId)) {
         return;
       }
+      webviewProvider.trackCodeEditor(event.textEditor);
       const line = event.selections[0]?.active.line;
       if (typeof line === "number") {
         webviewProvider.selectElementAtLine(line);
       }
     })
   );
+
+  // Restore editor outline if enabled in settings
+  const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+  if (config.get<boolean>("editorOutlineEnabled", false)) {
+    void webviewProvider.showEditorOutline();
+  }
 }
 
 async function selectFontFamily(
