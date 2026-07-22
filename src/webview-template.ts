@@ -226,6 +226,92 @@ export class WebViewTemplateManager {
             letter-spacing: 0.01em;
         }
 
+        /* Sort icon combobox */
+        .sort-combo {
+            position: relative;
+            display: inline-flex;
+        }
+
+        .sort-combo-trigger {
+            padding: 4px 6px;
+            gap: 2px;
+        }
+
+        .sort-combo-caret {
+            width: 10px;
+            height: 10px;
+            opacity: 0.7;
+            transform: rotate(90deg);
+        }
+
+        .sort-combo-caret svg {
+            width: 10px;
+            height: 10px;
+        }
+
+        .sort-combo.open .sort-combo-trigger {
+            background: var(--vscode-toolbar-hoverBackground);
+            opacity: 1;
+        }
+
+        .sort-combo.open .sort-combo-caret {
+            transform: rotate(-90deg);
+        }
+
+        .sort-combo-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            min-width: 148px;
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px solid var(--vscode-menu-border, var(--vscode-panel-border));
+            background: var(--vscode-menu-background, var(--vscode-dropdown-background, var(--vscode-sideBar-background)));
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .sort-combo.open .sort-combo-menu {
+            display: flex;
+        }
+
+        .sort-combo-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 6px 8px;
+            border: none;
+            border-radius: 4px;
+            background: transparent;
+            color: var(--vscode-menu-foreground, var(--vscode-foreground));
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        .sort-combo-option:hover {
+            background: var(--vscode-list-hoverBackground);
+        }
+
+        .sort-combo-option.active {
+            background: var(--vscode-list-activeSelectionBackground);
+            color: var(--vscode-list-activeSelectionForeground);
+        }
+
+        .sort-combo-option .btn-icon {
+            color: inherit;
+        }
+
+        .sort-combo-option-label {
+            flex: 1;
+        }
+
         /* Node Components */
         .node {
             display: block;
@@ -257,7 +343,7 @@ export class WebViewTemplateManager {
             margin-left: var(--spacing-lg);
             border-left: 1px solid var(--vscode-tree-indentGuidesStroke);
             padding-left: var(--spacing-sm);
-            overflow: hidden;
+            overflow: visible;
             transition: var(--transition);
         }
 
@@ -284,6 +370,7 @@ export class WebViewTemplateManager {
             width: 12px;
             height: 12px;
             display: block;
+            pointer-events: none;
         }
 
         .chevron.expanded {
@@ -366,6 +453,17 @@ export class WebViewTemplateManager {
             position: relative;
         }
 
+        /* Hover'da satırı ve ikonu öne al — sonraki kardeşler tooltip'i örtmesin */
+        .tooltip:hover {
+            z-index: 1000;
+        }
+
+        .node:has(.tooltip:hover),
+        .node-content:has(.tooltip:hover) {
+            position: relative;
+            z-index: 1000;
+        }
+
         .tooltip::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -381,7 +479,7 @@ export class WebViewTemplateManager {
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.2s;
-            z-index: 1000;
+            z-index: 1001;
             border: 1px solid var(--vscode-editorHoverWidget-border);
             min-width: max-content;
         }
@@ -397,7 +495,7 @@ export class WebViewTemplateManager {
             height: 0;
             pointer-events: none;
             opacity: 0;
-            z-index: 999;
+            z-index: 1000;
         }
         
         .tooltip:hover::after {
@@ -450,15 +548,26 @@ export class WebViewTemplateManager {
                 <span class="btn-label">Font</span>
             </button>
             <div class="toolbar-divider" role="separator" aria-hidden="true"></div>
-            <button class="btn btn-icon-only" id="sort-position" title="Sort by position in file">
-                <span class="btn-icon" data-toolbar-icon="sortPosition" aria-hidden="true"></span>
-            </button>
-            <button class="btn btn-icon-only" id="sort-name" title="Sort alphabetically by name">
-                <span class="btn-icon" data-toolbar-icon="sortName" aria-hidden="true"></span>
-            </button>
-            <button class="btn btn-icon-only" id="sort-category" title="Sort by element category">
-                <span class="btn-icon" data-toolbar-icon="sortCategory" aria-hidden="true"></span>
-            </button>
+            <div class="sort-combo" id="sort-combo">
+                <button type="button" class="btn sort-combo-trigger" id="sort-combo-trigger" title="Sort by: Position" aria-haspopup="listbox" aria-expanded="false" aria-controls="sort-combo-menu">
+                    <span class="btn-icon" id="sort-combo-icon" data-toolbar-icon="sortPosition" aria-hidden="true"></span>
+                    <span class="btn-icon sort-combo-caret" data-toolbar-icon="chevron" aria-hidden="true"></span>
+                </button>
+                <div class="sort-combo-menu" id="sort-combo-menu" role="listbox" aria-label="Sort mode">
+                    <button type="button" class="sort-combo-option" data-sort="position" role="option" title="Sort by position in file">
+                        <span class="btn-icon" data-toolbar-icon="sortPosition" aria-hidden="true"></span>
+                        <span class="sort-combo-option-label">Position</span>
+                    </button>
+                    <button type="button" class="sort-combo-option" data-sort="name" role="option" title="Sort alphabetically by name">
+                        <span class="btn-icon" data-toolbar-icon="sortName" aria-hidden="true"></span>
+                        <span class="sort-combo-option-label">Name</span>
+                    </button>
+                    <button type="button" class="sort-combo-option" data-sort="category" role="option" title="Sort by element category">
+                        <span class="btn-icon" data-toolbar-icon="sortCategory" aria-hidden="true"></span>
+                        <span class="sort-combo-option-label">Category</span>
+                    </button>
+                </div>
+            </div>
         </div>
     `;
     }
@@ -720,14 +829,43 @@ export class WebViewTemplateManager {
             }
 
             updateToolbar() {
-                document.querySelectorAll('.toolbar .btn[id^="sort-"]').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                const activeBtn = document.getElementById(\`sort-\${this.sortMode}\`);
-                if (activeBtn) {
-                    activeBtn.classList.add('active');
+                const sortModes = {
+                    position: { key: 'sortPosition', label: 'Position' },
+                    name: { key: 'sortName', label: 'Name' },
+                    category: { key: 'sortCategory', label: 'Category' }
+                };
+                const mode = sortModes[this.sortMode] || sortModes.position;
+                const iconEl = document.getElementById('sort-combo-icon');
+                if (iconEl) {
+                    iconEl.setAttribute('data-toolbar-icon', mode.key);
+                    const iconId = resolveIconId(
+                        mode.key,
+                        this.settings.toolbarIconSettings,
+                        ICON_DEFAULTS.toolbar
+                    );
+                    iconEl.innerHTML = resolveCatalogIcon(iconId);
                 }
+
+                const trigger = document.getElementById('sort-combo-trigger');
+                if (trigger) {
+                    trigger.title = 'Sort by: ' + mode.label;
+                }
+
+                document.querySelectorAll('.sort-combo-option').forEach(opt => {
+                    const isActive = opt.getAttribute('data-sort') === this.sortMode;
+                    opt.classList.toggle('active', isActive);
+                    opt.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                });
+            }
+
+            setSortComboOpen(open) {
+                const combo = document.getElementById('sort-combo');
+                const trigger = document.getElementById('sort-combo-trigger');
+                if (!combo || !trigger) {
+                    return;
+                }
+                combo.classList.toggle('open', open);
+                trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
             }
 
             // Collapsed state'leri localStorage'dan al
@@ -815,39 +953,43 @@ export class WebViewTemplateManager {
                     <span class="line-number">:\${node.line + 1}</span>
                 \`;
 
-                // Event listeners
-                content.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('chevron')) {
+                // Event listeners — chevron SVG tıklamaları closest ile yakalanır
+                const chevronEl = content.querySelector('.chevron');
+                if (chevronEl) {
+                    chevronEl.addEventListener('click', (e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         NodeRenderer.toggleNode(nodeElement, nodeKey);
-                    } else {
-                        // Click event için stop propagation kullanmıyoruz ki dblclick çalışabilsin
-                        state.selectNode(content);
-                        vscode.postMessage({ type: 'goToLine', line: node.line });
+                    });
+                }
+
+                content.addEventListener('click', (e) => {
+                    if (e.target.closest('.chevron')) {
+                        return;
                     }
+                    state.selectNode(content);
+                    vscode.postMessage({ type: 'goToLine', line: node.line });
                 });
 
                 // Çift tıklama event listener'ı - bloğu seç
                 content.addEventListener('dblclick', (event) => {
-                    // Chevron'a double-click yapılmadığından emin ol
-                    if (!event.target || !event.target.classList.contains('chevron')) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        event.stopImmediatePropagation(); // Diğer event listener'ları engelle
-                        
-                        state.selectNode(content);
-                        
-                        // Timeout ile message gönder - event loop'tan sonra
-                        setTimeout(() => {
-                            const message = { 
-                                type: 'selectBlock', 
-                                line: node.line,
-                                name: node.name,
-                                nodeType: node.type
-                            };
-                            vscode.postMessage(message);
-                        }, 10);
+                    if (event.target.closest('.chevron')) {
+                        return;
                     }
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+
+                    state.selectNode(content);
+
+                    setTimeout(() => {
+                        vscode.postMessage({
+                            type: 'selectBlock',
+                            line: node.line,
+                            name: node.name,
+                            nodeType: node.type
+                        });
+                    }, 10);
                 });
 
                 nodeElement.appendChild(content);
@@ -1103,32 +1245,41 @@ export class WebViewTemplateManager {
             vscode.postMessage({ type: 'selectFont' });
         });
 
-        // Sort butonlarını kontrol et ve event listener'ları ekle
-        const sortPositionBtn = document.getElementById('sort-position');
-        const sortNameBtn = document.getElementById('sort-name');
-        const sortCategoryBtn = document.getElementById('sort-category');
-        
-        if (sortPositionBtn) {
-            sortPositionBtn.addEventListener('click', () => {
-                state.setSortMode('position'); // Hemen UI'da aktif durumu göster
-                state.updateToolbar();
-                vscode.postMessage({ type: 'sortBy', mode: 'position' });
-            });
-        }
+        // Sort icon combobox
+        const sortCombo = document.getElementById('sort-combo');
+        const sortComboTrigger = document.getElementById('sort-combo-trigger');
+        const sortComboMenu = document.getElementById('sort-combo-menu');
 
-        if (sortNameBtn) {
-            sortNameBtn.addEventListener('click', () => {
-                state.setSortMode('name'); // Hemen UI'da aktif durumu göster
-                state.updateToolbar();
-                vscode.postMessage({ type: 'sortBy', mode: 'name' });
+        if (sortComboTrigger && sortCombo && sortComboMenu) {
+            sortComboTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = sortCombo.classList.contains('open');
+                state.setSortComboOpen(!isOpen);
             });
-        }
 
-        if (sortCategoryBtn) {
-            sortCategoryBtn.addEventListener('click', () => {
-                state.setSortMode('category'); // Hemen UI'da aktif durumu göster
-                state.updateToolbar();
-                vscode.postMessage({ type: 'sortBy', mode: 'category' });
+            sortComboMenu.querySelectorAll('.sort-combo-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const mode = option.getAttribute('data-sort');
+                    if (!mode) {
+                        return;
+                    }
+                    state.setSortMode(mode);
+                    state.setSortComboOpen(false);
+                    vscode.postMessage({ type: 'sortBy', mode });
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!sortCombo.contains(e.target)) {
+                    state.setSortComboOpen(false);
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    state.setSortComboOpen(false);
+                }
             });
         }
 
