@@ -5,6 +5,13 @@ All notable changes to **TS Outliner** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.1] - 2026-07-22
+
+### Fixed
+
+- Fuzzy search results are ordered by **relevance weight** (Fuse.js score) at each tree level
+- While filtering, the sort control shows a **Relevance** option (search icon) and a 1px accent border; both are removed when the filter is cleared
+
 ## [0.3.0] - 2026-07-22
 
 ### Added

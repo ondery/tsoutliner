@@ -285,6 +285,12 @@ export class WebViewTemplateManager {
         .sort-combo {
             position: relative;
             display: inline-flex;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .sort-combo.filter-active {
+            border-color: var(--vscode-focusBorder, var(--vscode-charts-blue, #3794ff));
         }
 
         .sort-combo-trigger {
@@ -718,10 +724,67 @@ export class WebViewTemplateManager {
                 if (clearBtn) {
                     clearBtn.classList.toggle('visible', this.searchQuery.length > 0);
                 }
+                this.updateFilterSortUI();
                 this.render();
             }
 
+            isFilterActive() {
+                return !!(this.searchQuery || '').trim();
+            }
+
+            updateFilterSortUI() {
+                const combo = document.getElementById('sort-combo');
+                const menu = document.getElementById('sort-combo-menu');
+                if (!combo || !menu) {
+                    return;
+                }
+
+                const filterActive = this.isFilterActive();
+                combo.classList.toggle('filter-active', filterActive);
+
+                let relevanceOpt = document.getElementById('sort-relevance-option');
+                if (filterActive) {
+                    if (!relevanceOpt) {
+                        relevanceOpt = document.createElement('button');
+                        relevanceOpt.type = 'button';
+                        relevanceOpt.id = 'sort-relevance-option';
+                        relevanceOpt.className = 'sort-combo-option';
+                        relevanceOpt.setAttribute('data-sort', 'relevance');
+                        relevanceOpt.setAttribute('role', 'option');
+                        relevanceOpt.title = 'Sort by search relevance';
+                        relevanceOpt.innerHTML =
+                            '<span class="btn-icon" data-toolbar-icon="sortRelevance" aria-hidden="true"></span>' +
+                            '<span class="sort-combo-option-label">Relevance</span>';
+                        menu.insertBefore(relevanceOpt, menu.firstChild);
+
+                        const iconEl = relevanceOpt.querySelector('[data-toolbar-icon]');
+                        if (iconEl) {
+                            const iconId = resolveIconId(
+                                'sortRelevance',
+                                this.settings.toolbarIconSettings,
+                                ICON_DEFAULTS.toolbar
+                            );
+                            iconEl.innerHTML = resolveCatalogIcon(iconId);
+                        }
+
+                        relevanceOpt.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            state.setSortComboOpen(false);
+                        });
+                    }
+                } else if (relevanceOpt) {
+                    relevanceOpt.remove();
+                }
+
+                this.updateToolbar();
+            }
+
             setSortMode(mode) {
+                // Relevance is filter-only; ignore user picks for it
+                if (mode === 'relevance') {
+                    this.updateToolbar();
+                    return;
+                }
                 this.sortMode = mode;
                 this.updateToolbar();
             }
@@ -852,9 +915,11 @@ export class WebViewTemplateManager {
                 const sortModes = {
                     position: { key: 'sortPosition', label: 'Position' },
                     name: { key: 'sortName', label: 'Name' },
-                    category: { key: 'sortCategory', label: 'Category' }
+                    category: { key: 'sortCategory', label: 'Category' },
+                    relevance: { key: 'sortRelevance', label: 'Relevance' }
                 };
-                const mode = sortModes[this.sortMode] || sortModes.position;
+                const effectiveMode = this.isFilterActive() ? 'relevance' : this.sortMode;
+                const mode = sortModes[effectiveMode] || sortModes.position;
                 const iconEl = document.getElementById('sort-combo-icon');
                 if (iconEl) {
                     iconEl.setAttribute('data-toolbar-icon', mode.key);
@@ -868,11 +933,13 @@ export class WebViewTemplateManager {
 
                 const trigger = document.getElementById('sort-combo-trigger');
                 if (trigger) {
-                    trigger.title = 'Sort by: ' + mode.label;
+                    trigger.title = this.isFilterActive()
+                        ? 'Sort by: Relevance (active while filtering)'
+                        : 'Sort by: ' + mode.label;
                 }
 
                 document.querySelectorAll('.sort-combo-option').forEach(opt => {
-                    const isActive = opt.getAttribute('data-sort') === this.sortMode;
+                    const isActive = opt.getAttribute('data-sort') === effectiveMode;
                     opt.classList.toggle('active', isActive);
                     opt.setAttribute('aria-selected', isActive ? 'true' : 'false');
                 });
@@ -946,17 +1013,31 @@ export class WebViewTemplateManager {
                     return { nodes, forceExpand: false };
                 }
 
+                const scoreMap = new Map();
+
                 if (typeof Fuse === 'undefined') {
-                    // Fallback: simple case-insensitive includes
                     const lower = q.toLowerCase();
                     const matchKeys = new Set();
                     const collect = (list, parentPath = '', ancestors = []) => {
                         for (const node of list || []) {
                             const key = this.getNodeKey(node, parentPath);
                             const currentPath = parentPath ? \`\${parentPath}.\${node.name}\` : node.name;
-                            const haystack = \`\${node.name} \${node.type} \${NodeRenderer.getNodeDisplayName(node)}\`.toLowerCase();
-                            if (haystack.includes(lower)) {
+                            const name = (node.name || '').toLowerCase();
+                            const display = NodeRenderer.getNodeDisplayName(node).toLowerCase();
+                            const type = (node.type || '').toLowerCase();
+                            let score = Infinity;
+                            if (name === lower || display === lower) {
+                                score = 0;
+                            } else if (name.startsWith(lower) || display.startsWith(lower)) {
+                                score = 0.1;
+                            } else if (name.includes(lower) || display.includes(lower)) {
+                                score = 0.25;
+                            } else if (type.includes(lower)) {
+                                score = 0.4;
+                            }
+                            if (score < Infinity) {
                                 matchKeys.add(key);
+                                scoreMap.set(key, score);
                                 ancestors.forEach(k => matchKeys.add(k));
                             }
                             if (node.children && node.children.length) {
@@ -966,7 +1047,7 @@ export class WebViewTemplateManager {
                     };
                     collect(nodes);
                     return {
-                        nodes: this.pruneNodesByKeys(nodes, matchKeys),
+                        nodes: this.stripSearchScores(this.pruneNodesByKeys(nodes, matchKeys, '', scoreMap)),
                         forceExpand: true
                     };
                 }
@@ -978,28 +1059,34 @@ export class WebViewTemplateManager {
                         { name: 'displayName', weight: 0.2 },
                         { name: 'type', weight: 0.1 }
                     ],
-                    threshold: 0.35,
+                    threshold: 0.4,
                     ignoreLocation: true,
                     includeScore: true,
-                    minMatchCharLength: 1
+                    minMatchCharLength: 1,
+                    shouldSort: true
                 });
 
                 const results = fuse.search(q);
                 const visibleKeys = new Set();
                 for (const result of results) {
-                    visibleKeys.add(result.item.key);
+                    const score = typeof result.score === 'number' ? result.score : 1;
+                    const key = result.item.key;
+                    visibleKeys.add(key);
+                    if (!scoreMap.has(key) || score < scoreMap.get(key)) {
+                        scoreMap.set(key, score);
+                    }
                     for (const ancestorKey of result.item.ancestorKeys) {
                         visibleKeys.add(ancestorKey);
                     }
                 }
 
                 return {
-                    nodes: this.pruneNodesByKeys(nodes, visibleKeys),
+                    nodes: this.stripSearchScores(this.pruneNodesByKeys(nodes, visibleKeys, '', scoreMap)),
                     forceExpand: true
                 };
             }
 
-            pruneNodesByKeys(nodes, visibleKeys, parentPath = '') {
+            pruneNodesByKeys(nodes, visibleKeys, parentPath = '', scoreMap = null) {
                 const result = [];
                 for (const node of nodes || []) {
                     const key = this.getNodeKey(node, parentPath);
@@ -1007,22 +1094,52 @@ export class WebViewTemplateManager {
                         continue;
                     }
                     const currentPath = parentPath ? \`\${parentPath}.\${node.name}\` : node.name;
+                    const scoredChildren = node.children && node.children.length > 0
+                        ? this.pruneNodesByKeys(node.children, visibleKeys, currentPath, scoreMap)
+                        : [];
+
+                    let score = scoreMap && scoreMap.has(key) ? scoreMap.get(key) : Infinity;
+                    if (scoreMap && scoredChildren.length > 0) {
+                        for (const child of scoredChildren) {
+                            score = Math.min(score, child._score ?? Infinity);
+                        }
+                    }
+
                     const clone = {
                         name: node.name,
                         type: node.type,
                         visibility: node.visibility,
                         modifiers: node.modifiers,
-                        line: node.line
+                        line: node.line,
+                        _score: score
                     };
-                    if (node.children && node.children.length > 0) {
-                        const children = this.pruneNodesByKeys(node.children, visibleKeys, currentPath);
-                        if (children.length > 0) {
-                            clone.children = children;
-                        }
+                    if (scoredChildren.length > 0) {
+                        clone.children = scoredChildren;
                     }
                     result.push(clone);
                 }
+
+                if (scoreMap) {
+                    result.sort((a, b) => {
+                        const scoreDiff = (a._score ?? Infinity) - (b._score ?? Infinity);
+                        if (scoreDiff !== 0) {
+                            return scoreDiff;
+                        }
+                        return (a.name || '').localeCompare(b.name || '');
+                    });
+                }
+
                 return result;
+            }
+
+            stripSearchScores(nodes) {
+                return (nodes || []).map((node) => {
+                    const { _score, children, ...rest } = node;
+                    if (children && children.length > 0) {
+                        return { ...rest, children: this.stripSearchScores(children) };
+                    }
+                    return { ...rest };
+                });
             }
 
             render() {

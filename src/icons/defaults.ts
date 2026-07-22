@@ -44,6 +44,7 @@ export const DEFAULT_TOOLBAR_ICONS: Record<string, string> = {
   sortPosition: "lucide:map-pin",
   sortName: "lucide:arrow-down-a-z",
   sortCategory: "lucide:layers",
+  sortRelevance: "lucide:search",
   chevron: "lucide:chevron-right",
 };
 
@@ -163,5 +164,6 @@ export const TOOLBAR_ICON_EXAMPLES: Record<string, string[]> = {
   sortPosition: ["lucide:map-pin", "lucide:list-ordered", "lucide:list-tree"],
   sortName: ["lucide:arrow-down-a-z", "lucide:a-large-small", "lucide:case-sensitive"],
   sortCategory: ["lucide:layers", "lucide:list-tree", "lucide:folder"],
+  sortRelevance: ["lucide:search", "lucide:sparkles", "lucide:zap"],
   chevron: ["lucide:chevron-right", "lucide:plus", "lucide:circle"],
 };

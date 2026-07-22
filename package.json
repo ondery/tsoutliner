@@ -6,7 +6,7 @@
   },
   "displayName": "TS Outliner",
   "description": "Enhanced outline view for TypeScript, JavaScript, JSX, TSX, CSS, Markdown, and JSON with Font Awesome icons, fonts, and sorting.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -792,6 +792,7 @@
             "sortPosition": "lucide:map-pin",
             "sortName": "lucide:arrow-down-a-z",
             "sortCategory": "lucide:layers",
+            "sortRelevance": "lucide:search",
             "chevron": "lucide:chevron-right"
           },
           "properties": {
@@ -843,6 +844,16 @@
                 "lucide:layers",
                 "lucide:list-tree",
                 "lucide:folder"
+              ]
+            },
+            "sortRelevance": {
+              "type": "string",
+              "default": "lucide:search",
+              "description": "Iconify ID for sort-by-relevance (shown while filtering).",
+              "examples": [
+                "lucide:search",
+                "lucide:sparkles",
+                "lucide:zap"
               ]
             },
             "chevron": {
