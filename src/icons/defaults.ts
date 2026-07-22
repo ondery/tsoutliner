@@ -41,6 +41,7 @@ export const DEFAULT_MODERN_ICONS: Record<string, string> = {
 export const DEFAULT_TOOLBAR_ICONS: Record<string, string> = {
   refresh: "lucide:refresh-cw",
   collapseAll: "lucide:fold-vertical",
+  editorOutline: "lucide:list-tree",
   sortPosition: "lucide:map-pin",
   sortName: "lucide:arrow-down-a-z",
   sortCategory: "lucide:layers",
@@ -161,6 +162,7 @@ export const MODERN_ICON_EXAMPLES: Record<string, string[]> = {
 export const TOOLBAR_ICON_EXAMPLES: Record<string, string[]> = {
   refresh: ["lucide:refresh-cw", "lucide:infinity", "lucide:zap"],
   collapseAll: ["lucide:fold-vertical", "lucide:folder-minus", "lucide:list-tree"],
+  editorOutline: ["lucide:list-tree", "lucide:layers", "lucide:folder"],
   sortPosition: ["lucide:map-pin", "lucide:list-ordered", "lucide:list-tree"],
   sortName: ["lucide:arrow-down-a-z", "lucide:a-large-small", "lucide:case-sensitive"],
   sortCategory: ["lucide:layers", "lucide:list-tree", "lucide:folder"],

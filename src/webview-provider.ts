@@ -274,6 +274,9 @@ export class OutlineWebviewProvider implements vscode.WebviewViewProvider {
         case "refresh":
           await this.refresh();
           break;
+        case "toggleEditorOutline":
+          await this.toggleEditorOutline();
+          break;
         default:
           console.error(`Unknown message type: ${message.type}`);
       }

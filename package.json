@@ -6,7 +6,7 @@
   },
   "displayName": "TS Outliner",
   "description": "Enhanced outline view for TypeScript, JavaScript, JSX, TSX, CSS, Markdown, and JSON with Font Awesome icons, fonts, and sorting.",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -136,13 +136,24 @@
       "editor/title": [
         {
           "command": "tsOutlineEnhancer.toggleEditorOutline",
-          "when": "resourceLangId =~ /typescript|typescriptreact|javascript|javascriptreact|css|scss|less|markdown|json|jsonc/",
+          "when": "editorIsOpen",
           "group": "navigation@90"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "tsOutlineEnhancer.toggleEditorOutline",
+          "when": "view == tsOutlineEnhancer.webview",
+          "group": "navigation"
         }
       ],
       "commandPalette": [
         {
-          "command": "tsOutlineEnhancer.showEditorOutline"
+          "command": "tsOutlineEnhancer.toggleEditorOutline"
+        },
+        {
+          "command": "tsOutlineEnhancer.showEditorOutline",
+          "when": "!tsOutlineEnhancer.editorOutlineOpen"
         },
         {
           "command": "tsOutlineEnhancer.hideEditorOutline",
@@ -789,6 +800,7 @@
           "default": {
             "refresh": "lucide:refresh-cw",
             "collapseAll": "lucide:fold-vertical",
+            "editorOutline": "lucide:list-tree",
             "sortPosition": "lucide:map-pin",
             "sortName": "lucide:arrow-down-a-z",
             "sortCategory": "lucide:layers",
@@ -814,6 +826,16 @@
                 "lucide:fold-vertical",
                 "lucide:folder-minus",
                 "lucide:list-tree"
+              ]
+            },
+            "editorOutline": {
+              "type": "string",
+              "default": "lucide:list-tree",
+              "description": "Iconify ID for toggle editor-outline button.",
+              "examples": [
+                "lucide:list-tree",
+                "lucide:layers",
+                "lucide:folder"
               ]
             },
             "sortPosition": {

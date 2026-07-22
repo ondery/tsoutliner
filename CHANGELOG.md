@@ -5,6 +5,17 @@ All notable changes to **TS Outliner** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.2] - 2026-07-22
+
+### Fixed
+
+- **CSS / SCSS / Less** outline now works reliably (supports `SymbolInformation` providers and a brace-tracking fallback parser)
+- **Editor outline toggle** is easier to find: toolbar **Editor** button, editor title bar, activity-bar view title, and command palette
+
+### Added
+
+- `examples/demo.css` sample file
+
 ## [0.3.1] - 2026-07-22
 
 ### Fixed

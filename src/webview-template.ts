@@ -574,6 +574,10 @@ export class WebViewTemplateManager {
                 <span class="btn-icon" data-toolbar-icon="collapseAll" aria-hidden="true"></span>
                 <span class="btn-label">Collapse All</span>
             </button>
+            <button class="btn" id="toggle-editor-outline-btn" title="Toggle editor outline (beside editor)">
+                <span class="btn-icon" data-toolbar-icon="editorOutline" aria-hidden="true"></span>
+                <span class="btn-label">Editor</span>
+            </button>
             <div class="toolbar-divider" role="separator" aria-hidden="true"></div>
             <div class="sort-combo" id="sort-combo">
                 <button type="button" class="btn sort-combo-trigger" id="sort-combo-trigger" title="Sort by: Position" aria-haspopup="listbox" aria-expanded="false" aria-controls="sort-combo-menu">
@@ -1529,6 +1533,13 @@ export class WebViewTemplateManager {
         document.getElementById('collapse-all-btn').addEventListener('click', () => {
             Utils.collapseAll();
         });
+
+        const toggleEditorOutlineBtn = document.getElementById('toggle-editor-outline-btn');
+        if (toggleEditorOutlineBtn) {
+            toggleEditorOutlineBtn.addEventListener('click', () => {
+                vscode.postMessage({ type: 'toggleEditorOutline' });
+            });
+        }
 
         // Outline search (Fuse.js)
         const searchInput = document.getElementById('outline-search-input');

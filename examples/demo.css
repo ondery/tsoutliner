@@ -1,0 +1,59 @@
+:root {
+  --bg: #0f172a;
+  --text: #e2e8f0;
+}
+
+/* Layout */
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #334155;
+}
+
+.header .logo {
+  font-weight: 700;
+}
+
+.header nav a {
+  margin-right: 1rem;
+  color: #93c5fd;
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 0.75rem;
+  }
+
+  .header nav {
+    display: none;
+  }
+}
+
+.card,
+.card-primary {
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.card:hover {
+  outline: 1px solid #64748b;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fade-in 200ms ease-out;
+}

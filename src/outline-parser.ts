@@ -37,18 +37,72 @@ export class OutlineParser {
       const symbols = (await vscode.commands.executeCommand(
         "vscode.executeDocumentSymbolProvider",
         document.uri
-      )) as vscode.DocumentSymbol[] | undefined;
+      )) as
+        | Array<vscode.DocumentSymbol | vscode.SymbolInformation>
+        | undefined;
 
       if (!symbols || symbols.length === 0) {
         return this.fallbackParse(document);
       }
 
-      const nodes = await this.convertSymbolsToNodes(symbols, languageId);
-      return nodes.filter((node): node is OutlineNode => node !== null);
+      let nodes: OutlineNode[];
+      if (this.isSymbolInformationList(symbols)) {
+        nodes = this.convertSymbolInformationsToNodes(symbols, languageId);
+      } else {
+        nodes = (
+          await this.convertSymbolsToNodes(
+            symbols as vscode.DocumentSymbol[],
+            languageId
+          )
+        ).filter((node): node is OutlineNode => node !== null);
+      }
+
+      if (nodes.length === 0) {
+        return this.fallbackParse(document);
+      }
+      return nodes;
     } catch (error) {
       console.error("Error getting document symbols:", error);
       return this.fallbackParse(document);
     }
+  }
+
+  private isSymbolInformationList(
+    symbols: Array<vscode.DocumentSymbol | vscode.SymbolInformation>
+  ): symbols is vscode.SymbolInformation[] {
+    const first = symbols[0] as vscode.DocumentSymbol &
+      vscode.SymbolInformation;
+    return Boolean(
+      first &&
+        "location" in first &&
+        first.location?.range &&
+        !("selectionRange" in first)
+    );
+  }
+
+  private convertSymbolInformationsToNodes(
+    symbols: vscode.SymbolInformation[],
+    languageId: string
+  ): OutlineNode[] {
+    const nodes: OutlineNode[] = [];
+    for (const symbol of symbols) {
+      const nodeType = this.mapSymbolKindToNodeType(symbol.kind, languageId);
+      if (!nodeType) {
+        continue;
+      }
+      const visibility =
+        isCodeLanguage(languageId) && !isCssLanguage(languageId)
+          ? "public"
+          : "none";
+      nodes.push({
+        name: symbol.name,
+        type: nodeType,
+        visibility,
+        modifiers: [],
+        line: symbol.location.range.start.line,
+      });
+    }
+    return nodes;
   }
 
   private async convertSymbolsToNodes(
@@ -165,8 +219,10 @@ export class OutlineParser {
           return "event";
         case vscode.SymbolKind.Operator:
           return "operator";
+        case vscode.SymbolKind.File:
+          return "file";
         default:
-          return "property";
+          return "class";
       }
     }
 
@@ -402,77 +458,170 @@ export class OutlineParser {
 
   /**
    * Fallback CSS/SCSS/Less outline when document symbols are unavailable.
-   * Captures at-rules and selectors that open a block.
+   * Walks the text and collects selectors / at-rules that open blocks.
    */
   private fallbackCssParsing(document: vscode.TextDocument): OutlineNode[] {
     const text = document.getText();
     const nodes: OutlineNode[] = [];
-    const rootStack: { indent: number; node: OutlineNode }[] = [];
+    const stack: OutlineNode[] = [];
 
-    const lines = text.split(/\r?\n/);
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const trimmed = line.trim();
+    let i = 0;
+    let line = 0;
+    let inBlockComment = false;
+    let inLineComment = false;
+    let inString: '"' | "'" | null = null;
+    let pending = "";
+    let pendingLine = 0;
+    let pendingStart = true;
+
+    const flushPendingAsNode = (hasBlock: boolean): void => {
+      const name = pending.replace(/\s+/g, " ").trim();
+      pending = "";
+      pendingStart = true;
+      if (!name || name === "{" || name === "}") {
+        return;
+      }
+      // Skip property declarations: color: red
       if (
-        !trimmed ||
-        trimmed.startsWith("//") ||
-        trimmed.startsWith("/*") ||
-        trimmed.startsWith("*") ||
-        trimmed.startsWith("}")
+        /^[\w-]+\s*:/.test(name) &&
+        !name.startsWith("@") &&
+        !name.startsWith("&") &&
+        !name.startsWith(":") &&
+        !name.startsWith(".") &&
+        !name.startsWith("#") &&
+        !name.startsWith("*") &&
+        !name.startsWith("[")
       ) {
-        continue;
+        return;
       }
 
-      // Selector or at-rule followed by { on same or next lines
-      const blockMatch = trimmed.match(
-        /^((?:@[a-zA-Z-]+[^{;]*|[^{;@}]+))\s*\{?\s*$/
-      );
-      if (!blockMatch) {
-        continue;
-      }
-
-      let name = blockMatch[1].trim();
-      if (!name || name === "{" || /^[;:]$/.test(name)) {
-        continue;
-      }
-      // Skip bare property declarations (color: red)
-      if (/^[\w-]+\s*:/.test(name) && !name.startsWith("@") && !name.includes("&")) {
-        continue;
-      }
-
-      const indent = line.search(/\S/);
       const isAtRule = name.startsWith("@");
+      // @import / @charset / @namespace without block
+      if (isAtRule && !hasBlock && /;?\s*$/.test(name)) {
+        return;
+      }
+
       const node: OutlineNode = {
-        name: name.length > 80 ? name.slice(0, 77) + "…" : name,
-        type: isAtRule ? "module" : name.startsWith("--") ? "variable" : "class",
+        name: name.length > 100 ? `${name.slice(0, 97)}…` : name,
+        type: isAtRule
+          ? "module"
+          : name.startsWith("--")
+            ? "variable"
+            : "class",
         visibility: "none",
         modifiers: [],
-        line: i,
+        line: pendingLine,
       };
 
-      while (rootStack.length > 0 && rootStack[rootStack.length - 1].indent >= indent) {
-        rootStack.pop();
-      }
-
-      if (rootStack.length === 0) {
+      if (stack.length === 0) {
         nodes.push(node);
       } else {
-        const parent = rootStack[rootStack.length - 1].node;
+        const parent = stack[stack.length - 1];
         if (!parent.children) {
           parent.children = [];
         }
         parent.children.push(node);
       }
 
-      if (trimmed.includes("{") || /\{\s*$/.test(trimmed)) {
-        rootStack.push({ indent, node });
-      } else {
-        // Peek ahead for { on following line
-        const next = lines[i + 1]?.trim() ?? "";
-        if (next.startsWith("{")) {
-          rootStack.push({ indent, node });
-        }
+      if (hasBlock) {
+        stack.push(node);
       }
+    };
+
+    while (i < text.length) {
+      const ch = text[i];
+      const next = text[i + 1];
+
+      if (ch === "\n") {
+        line += 1;
+        inLineComment = false;
+        i += 1;
+        continue;
+      }
+
+      if (inLineComment) {
+        i += 1;
+        continue;
+      }
+
+      if (inBlockComment) {
+        if (ch === "*" && next === "/") {
+          inBlockComment = false;
+          i += 2;
+          continue;
+        }
+        i += 1;
+        continue;
+      }
+
+      if (inString) {
+        if (ch === "\\") {
+          i += 2;
+          continue;
+        }
+        if (ch === inString) {
+          inString = null;
+        }
+        if (pendingStart) {
+          pendingLine = line;
+          pendingStart = false;
+        }
+        pending += ch;
+        i += 1;
+        continue;
+      }
+
+      if (ch === "/" && next === "*") {
+        inBlockComment = true;
+        i += 2;
+        continue;
+      }
+      if (ch === "/" && next === "/") {
+        inLineComment = true;
+        i += 2;
+        continue;
+      }
+      if (ch === '"' || ch === "'") {
+        inString = ch;
+        if (pendingStart) {
+          pendingLine = line;
+          pendingStart = false;
+        }
+        pending += ch;
+        i += 1;
+        continue;
+      }
+
+      if (ch === "{") {
+        flushPendingAsNode(true);
+        i += 1;
+        continue;
+      }
+
+      if (ch === "}") {
+        pending = "";
+        pendingStart = true;
+        if (stack.length > 0) {
+          stack.pop();
+        }
+        i += 1;
+        continue;
+      }
+
+      if (ch === ";" && pending.trim().startsWith("@")) {
+        // at-rule without block (e.g. @import)
+        pending = "";
+        pendingStart = true;
+        i += 1;
+        continue;
+      }
+
+      if (pendingStart && /\S/.test(ch)) {
+        pendingLine = line;
+        pendingStart = false;
+      }
+      pending += ch;
+      i += 1;
     }
 
     return nodes;
