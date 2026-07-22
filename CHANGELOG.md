@@ -5,6 +5,20 @@ All notable changes to **TS Outliner** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- **Modern Lucide icon set** as the default (`iconType: modern`) — theme-aware line icons for toolbar and outline symbols
+- `modernIconSettings` and `toolbarIconSettings` for per-action Iconify IDs (`lucide:name`)
+- Bundled icon catalog under `media/icons/` with `npm run icons:catalog` regeneration
+- Commands: **Open Modern Icon Settings**, **Open Toolbar Icon Settings**
+
+### Changed
+
+- Toolbar uses ghost buttons (no solid primary fill) that respect dark/light themes
+- Outline chevron and toolbar actions use SVG icons instead of emoji
+
 ## [0.1.0] - 2026-07-21
 
 ### Added

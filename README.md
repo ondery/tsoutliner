@@ -56,6 +56,8 @@ Sample files live in [`examples/`](examples/).
 | **TS Outliner: Sort By: Position / Name / Category** | Change sort order |
 | **TS Outliner: Open Settings** | Open all extension settings |
 | **TS Outliner: Open Emoji / Icon / Font Settings** | Jump to specific setting groups |
+| **TS Outliner: Open Modern Icon Settings** | Customize Lucide outline icons |
+| **TS Outliner: Open Toolbar Icon Settings** | Customize toolbar action icons |
 
 ## Settings
 
@@ -63,7 +65,9 @@ All settings live under `tsOutlineEnhancer.*`. Notable options:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `tsOutlineEnhancer.iconType` | `emoji` | `emoji`, `fontawesome`, or `none` |
+| `tsOutlineEnhancer.iconType` | `modern` | `modern`, `emoji`, `fontawesome`, or `none` |
+| `tsOutlineEnhancer.modernIconSettings` | (object) | Lucide icon IDs per symbol (`lucide:box`, …) |
+| `tsOutlineEnhancer.toolbarIconSettings` | (object) | Lucide icon IDs for toolbar actions |
 | `tsOutlineEnhancer.fontFamily` | Consolas… | Outline panel font |
 | `tsOutlineEnhancer.fontSize` | `13` | Font size (px) |
 | `tsOutlineEnhancer.sortMode` | `position` | Default sort mode |
@@ -74,6 +78,27 @@ All settings live under `tsOutlineEnhancer.*`. Notable options:
 | `tsOutlineEnhancer.showVisibilityInLabel` | `false` | Append `[public]` etc. to labels |
 
 Open **Settings → Extensions → TS Outliner**, or run **TS Outliner: Open Settings**.
+
+### Modern icons (default)
+
+Toolbar and outline symbols use **Lucide** line icons (`currentColor`), so they follow the active dark/light theme. Override any icon with an Iconify ID from the bundled catalog:
+
+```json
+{
+  "tsOutlineEnhancer.iconType": "modern",
+  "tsOutlineEnhancer.modernIconSettings": {
+    "class": "lucide:box",
+    "method": "lucide:cog",
+    "private": "lucide:lock"
+  },
+  "tsOutlineEnhancer.toolbarIconSettings": {
+    "refresh": "lucide:refresh-cw",
+    "collapseAll": "lucide:fold-vertical"
+  }
+}
+```
+
+See `examples/modern-icons-examples.json` for ready-made sets. To add icons to the catalog: drop SVGs into `media/icons/`, then run `npm run icons:catalog`.
 
 ### Font Awesome
 
@@ -90,6 +115,7 @@ src/
   webview-template.ts   Panel HTML / CSS / client script
   outline-sorter.ts     Position / name / category sorting
   system-fonts.ts       Cross-platform font discovery
+  icons/                Lucide catalog, defaults, resolve helpers
   types.ts              Shared types
 ```
 

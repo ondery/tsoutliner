@@ -1,18 +1,31 @@
 {
-    // 2. Font Family Ayarları
-    "tsOutlineEnhancer.fontFamily": "Fira Code, JetBrains Mono, Consolas, monospace",
-    "tsOutlineEnhancer.fontSize": 14,
-    "tsOutlineEnhancer.lineHeight": 1.3,
-    // 3. İkon Görünüm Ayarları (YENİ!)
-    "tsOutlineEnhancer.iconSize": 16, // İkon büyüklüğü (8-32 px)
-    "tsOutlineEnhancer.iconSpacing": 4, // İkonlar arası boşluk (0-20 px)/ TS OUTLINER Extension Settings Examples
     // 1. İkon Türü Seçimi
-    "tsOutlineEnhancer.iconType": "emoji", // "emoji", "fontawesome", "none"
+    "tsOutlineEnhancer.iconType": "modern", // "modern", "emoji", "fontawesome", "none"
     // 2. Font Family Ayarları
     "tsOutlineEnhancer.fontFamily": "Fira Code, JetBrains Mono, Consolas, monospace",
     "tsOutlineEnhancer.fontSize": 14,
     "tsOutlineEnhancer.lineHeight": 1.3,
-    // 4. Emoji Ayarları (iconType: "emoji" için)
+    // 3. İkon Görünüm Ayarları
+    "tsOutlineEnhancer.iconSize": 16,
+    "tsOutlineEnhancer.iconSpacing": 4,
+    "tsOutlineEnhancer.iconToTextSpacing": 6,
+    // 4. Modern Lucide ikonları (iconType: "modern" — varsayılan)
+    "tsOutlineEnhancer.modernIconSettings": {
+        "class": "lucide:box",
+        "method": "lucide:cog",
+        "function": "lucide:square-function",
+        "private": "lucide:lock"
+    },
+    // 5. Toolbar ikonları
+    "tsOutlineEnhancer.toolbarIconSettings": {
+        "refresh": "lucide:refresh-cw",
+        "collapseAll": "lucide:fold-vertical",
+        "font": "lucide:type",
+        "sortPosition": "lucide:map-pin",
+        "sortName": "lucide:arrow-down-a-z",
+        "sortCategory": "lucide:layers"
+    },
+    // 6. Emoji Ayarları (iconType: "emoji" için)
     "tsOutlineEnhancer.emojiSettings": {
         "public": "🟢",
         "private": "🔴",
@@ -32,7 +45,7 @@
         "class": "📦",
         "interface": "📋"
     },
-    // 5. FontAwesome Ayarları (iconType: "fontawesome" için)
+    // 7. FontAwesome Ayarları (iconType: "fontawesome" için)
     "tsOutlineEnhancer.fontAwesomeSettings": {
         "public": "fas fa-globe",
         "private": "fas fa-lock",
@@ -48,6 +61,7 @@
         "method": "fas fa-cog",
         "function": "fas fa-wrench",
         "getter": "fas fa-download",
+
         "setter": "fas fa-upload",
         "class": "fas fa-cube",
         "interface": "fas fa-clipboard-list"

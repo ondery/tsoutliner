@@ -127,7 +127,9 @@ export class OutlineWebviewProvider implements vscode.WebviewViewProvider {
       settings: {
         emojiSettings: config.get("emojiSettings", {}),
         fontAwesomeSettings: config.get("fontAwesomeSettings", {}),
-        iconType: config.get("iconType", "emoji"),
+        modernIconSettings: config.get("modernIconSettings", {}),
+        toolbarIconSettings: config.get("toolbarIconSettings", {}),
+        iconType: config.get("iconType", "modern"),
         fontFamily: config.get(
           "fontFamily",
           "Consolas, 'Courier New', monospace"

@@ -1,4 +1,8 @@
 import * as vscode from "vscode";
+import {
+  serializeDefaults,
+  serializeIconCatalog,
+} from "./icons";
 
 /**
  * WebView HTML şablonlarını ve styling'ini yöneten modül
@@ -109,12 +113,24 @@ export class WebViewTemplateManager {
         }
 
         .toolbar {
-            padding: var(--spacing-sm);
-            border-bottom: 1px solid var(--vscode-panel-border);
-            background-color: var(--vscode-sideBar-background);
+            padding: 4px 6px;
+            border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border, var(--vscode-panel-border));
+            background-color: transparent;
             display: flex;
-            gap: var(--spacing-xs);
+            align-items: center;
+            gap: 2px;
             flex-wrap: wrap;
+            font-family: var(--vscode-font-family);
+            font-size: var(--vscode-font-size);
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 16px;
+            background: var(--vscode-panel-border);
+            margin: 0 4px;
+            flex-shrink: 0;
+            opacity: 0.7;
         }
 
         .content {
@@ -138,37 +154,76 @@ export class WebViewTemplateManager {
             border-bottom: 1px solid var(--vscode-panel-border);
         }
 
-        /* Button Components */
+        /* Toolbar buttons — ghost style, theme-aware (dark/light) */
         .btn {
-            padding: var(--spacing-xs) var(--spacing-sm);
-            border: 1px solid var(--vscode-button-border);
-            border-radius: var(--border-radius);
-            background: var(--vscode-button-background);
-            color: var(--vscode-button-foreground);
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            background: transparent;
+            color: var(--vscode-icon-foreground, var(--vscode-foreground));
             cursor: pointer;
-            font-size: 0.8em; /* Relative to container font size */
-            display: flex;
+            font-size: 11px;
+            font-family: inherit;
+            font-weight: 500;
+            display: inline-flex;
             align-items: center;
-            gap: var(--spacing-xs);
-            transition: var(--transition);
+            justify-content: center;
+            gap: 5px;
+            transition: background-color 0.12s ease, color 0.12s ease, opacity 0.12s ease;
             white-space: nowrap;
+            line-height: 1;
+            min-height: 24px;
+            opacity: 0.82;
         }
 
         .btn:hover {
-            background: var(--vscode-button-hoverBackground);
+            background: var(--vscode-toolbar-hoverBackground);
+            opacity: 1;
+        }
+
+        .btn:active {
+            background: var(--vscode-toolbar-activeBackground, var(--vscode-toolbar-hoverBackground));
         }
 
         .btn.active {
-            background: rgba(255, 255, 255, 0.16);
-            border-color: var(--vscode-focusBorder);
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-            font-weight: 600;
-            /* transform: translateY(1px); */
+            background: var(--vscode-toolbar-activeBackground, var(--vscode-list-hoverBackground));
+            color: var(--vscode-foreground);
+            opacity: 1;
+            box-shadow: inset 0 0 0 1px var(--vscode-focusBorder);
         }
 
         .btn.active:hover {
-            background: var(--vscode-button-hoverBackground);
-            border-color: var(--vscode-focusBorder);
+            background: var(--vscode-toolbar-hoverBackground);
+        }
+
+        .btn:focus-visible {
+            outline: 1px solid var(--vscode-focusBorder);
+            outline-offset: 1px;
+        }
+
+        .btn-icon-only {
+            padding: 4px;
+            min-width: 24px;
+        }
+
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            color: inherit;
+        }
+
+        .btn-icon svg {
+            width: 14px;
+            height: 14px;
+            display: block;
+        }
+
+        .btn-label {
+            letter-spacing: 0.01em;
         }
 
         /* Node Components */
@@ -212,14 +267,23 @@ export class WebViewTemplateManager {
 
         /* Icon Components */
         .chevron {
-            width: 0.75rem;
-            height: 0.75rem;
+            width: 0.875rem;
+            height: 0.875rem;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-            font-size: 0.8em; /* Relative to parent font size */
+            transition: transform 0.15s ease-in-out, background-color 0.12s ease;
+            font-size: 0.75em;
+            color: var(--vscode-icon-foreground, var(--vscode-descriptionForeground));
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .chevron svg {
+            width: 12px;
+            height: 12px;
+            display: block;
         }
 
         .chevron.expanded {
@@ -228,43 +292,45 @@ export class WebViewTemplateManager {
 
         .chevron:hover {
             background-color: var(--vscode-toolbar-hoverBackground);
-            border-radius: var(--border-radius);
+            color: var(--vscode-foreground);
         }
 
-        .type-icon {
-            font-size: var(--icon-size); /* Use icon size setting */
-            display: flex;
+        .type-icon,
+        .fa-icon,
+        .svg-icon {
+            font-size: var(--icon-size);
+            display: inline-flex;
             align-items: center;
-            width: var(--icon-size);
-            height: var(--icon-size);
-        }
-
-        /* FontAwesome icon styling */
-        .fa-icon {
-            font-size: var(--icon-size); /* Use icon size setting */
-            display: flex;
-            align-items: center;
-            width: var(--icon-size);
-            height: var(--icon-size);
             justify-content: center;
+            width: var(--icon-size);
+            height: var(--icon-size);
+            flex-shrink: 0;
+            color: var(--vscode-icon-foreground, var(--vscode-foreground));
         }
 
-        .feature-icon {
-            font-size: calc(var(--icon-size) * 0.8); /* 80% of icon size */
-            opacity: 0.8;
-            display: flex;
+        .svg-icon svg,
+        .feature-svg-icon svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .feature-icon,
+        .feature-fa-icon,
+        .feature-svg-icon {
+            font-size: calc(var(--icon-size) * 0.8);
+            opacity: 0.85;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
             width: calc(var(--icon-size) * 0.8);
             height: calc(var(--icon-size) * 0.8);
+            flex-shrink: 0;
+            color: var(--vscode-icon-foreground, var(--vscode-descriptionForeground));
         }
 
         .feature-fa-icon {
-            font-size: calc(var(--icon-size) * 0.7); /* 70% of icon size */
-            display: flex;
-            align-items: center;
-            width: calc(var(--icon-size) * 0.8);
-            height: calc(var(--icon-size) * 0.8);
-            justify-content: center;
+            font-size: calc(var(--icon-size) * 0.7);
         }
 
         .features {
@@ -286,11 +352,13 @@ export class WebViewTemplateManager {
 
         /* Empty State */
         .empty-state {
-            padding: var(--spacing-lg);
+            padding: var(--spacing-lg) var(--spacing-md);
             text-align: center;
             color: var(--vscode-descriptionForeground);
-            font-style: italic;
-            font-size: 0.9em; /* Relative to container font size */
+            font-style: normal;
+            font-size: 0.85em;
+            line-height: 1.45;
+            opacity: 0.9;
         }
 
         /* Tooltip */
@@ -370,26 +438,26 @@ export class WebViewTemplateManager {
         return `
         <div class="toolbar">
             <button class="btn" id="refresh-btn" title="Refresh outline">
-                <span>🔄</span>
-                <span>Refresh</span>
+                <span class="btn-icon" data-toolbar-icon="refresh" aria-hidden="true"></span>
+                <span class="btn-label">Refresh</span>
             </button>
             <button class="btn" id="collapse-all-btn" title="Collapse all nodes">
-                <span>📁</span>
-                <span>Collapse All</span>
+                <span class="btn-icon" data-toolbar-icon="collapseAll" aria-hidden="true"></span>
+                <span class="btn-label">Collapse All</span>
             </button>
             <button class="btn" id="select-font-btn" title="Select Font Family">
-                <span>🔤</span>
-                <span>Font</span>
+                <span class="btn-icon" data-toolbar-icon="font" aria-hidden="true"></span>
+                <span class="btn-label">Font</span>
             </button>
-            <div style="width: 1px; height: 1rem; background: var(--vscode-panel-border); margin: 0 var(--spacing-xs);"></div>
-            <button class="btn" id="sort-position" title="Sort by position in file">
-                <span>📍</span>
+            <div class="toolbar-divider" role="separator" aria-hidden="true"></div>
+            <button class="btn btn-icon-only" id="sort-position" title="Sort by position in file">
+                <span class="btn-icon" data-toolbar-icon="sortPosition" aria-hidden="true"></span>
             </button>
-            <button class="btn" id="sort-name" title="Sort alphabetically by name">
-                <span>🔤</span>
+            <button class="btn btn-icon-only" id="sort-name" title="Sort alphabetically by name">
+                <span class="btn-icon" data-toolbar-icon="sortName" aria-hidden="true"></span>
             </button>
-            <button class="btn" id="sort-category" title="Sort by element category">
-                <span>📚</span>
+            <button class="btn btn-icon-only" id="sort-category" title="Sort by element category">
+                <span class="btn-icon" data-toolbar-icon="sortCategory" aria-hidden="true"></span>
             </button>
         </div>
     `;
@@ -414,6 +482,17 @@ export class WebViewTemplateManager {
      */
     getJavaScript() {
         return `
+        const ICON_CATALOG = ${serializeIconCatalog()};
+        const ICON_DEFAULTS = ${serializeDefaults()};
+
+        function resolveCatalogIcon(iconId) {
+            return ICON_CATALOG[iconId] || ICON_CATALOG['lucide:help-circle'] || '';
+        }
+
+        function resolveIconId(key, settingsMap, defaultsMap) {
+            return (settingsMap && settingsMap[key]) || defaultsMap[key] || 'lucide:help-circle';
+        }
+
         // State Management
         class OutlineState {
             constructor() {
@@ -495,7 +574,9 @@ export class WebViewTemplateManager {
                         "operator": "fas fa-plus",
                         "typeParameter": "fas fa-font"
                     },
-                    iconType: "emoji",
+                    modernIconSettings: { ...ICON_DEFAULTS.modern },
+                    toolbarIconSettings: { ...ICON_DEFAULTS.toolbar },
+                    iconType: "modern",
                     fontFamily: "Consolas, 'Courier New', monospace",
                     fontSize: 13,
                     lineHeight: 1.2,
@@ -525,18 +606,35 @@ export class WebViewTemplateManager {
             }
 
             setSettings(newSettings) {
-                this.settings = { ...this.getDefaultSettings(), ...newSettings };
+                const defaults = this.getDefaultSettings();
+                this.settings = {
+                    ...defaults,
+                    ...newSettings,
+                    modernIconSettings: {
+                        ...defaults.modernIconSettings,
+                        ...(newSettings.modernIconSettings || {})
+                    },
+                    toolbarIconSettings: {
+                        ...defaults.toolbarIconSettings,
+                        ...(newSettings.toolbarIconSettings || {})
+                    },
+                    emojiSettings: {
+                        ...defaults.emojiSettings,
+                        ...(newSettings.emojiSettings || {})
+                    },
+                    fontAwesomeSettings: {
+                        ...defaults.fontAwesomeSettings,
+                        ...(newSettings.fontAwesomeSettings || {})
+                    }
+                };
                 
-                // Font ayarlarını CSS değişkenlerine uygula
                 this.updateFontStyles();
-                
-                // Ayarlar değiştiğinde yeniden render et
+                this.updateToolbarIcons();
                 this.render();
             }
 
             updateFontStyles() {
                 const container = document.getElementById('outline-container');
-                const sidebar = document.querySelector('.sidebar');
                 
                 if (container && this.settings.fontFamily) {
                     container.style.setProperty('--outline-font-family', this.settings.fontFamily);
@@ -547,12 +645,15 @@ export class WebViewTemplateManager {
                     container.style.setProperty('--icon-to-text-spacing', \`\${this.settings.iconToTextSpacing}px\`);
                     container.style.setProperty('--tooltip-font-size', \`\${this.settings.tooltipFontSize}px\`);
                 }
-                
-                // Sidebar'a da font ayarlarını uygula (toolbar için)
-                if (sidebar) {
-                    sidebar.style.fontFamily = this.settings.fontFamily || 'var(--vscode-font-family)';
-                    sidebar.style.fontSize = \`\${this.settings.fontSize}px\` || 'var(--vscode-font-size)';
-                }
+            }
+
+            updateToolbarIcons() {
+                const toolbarSettings = this.settings.toolbarIconSettings || {};
+                document.querySelectorAll('[data-toolbar-icon]').forEach(el => {
+                    const key = el.getAttribute('data-toolbar-icon');
+                    const iconId = resolveIconId(key, toolbarSettings, ICON_DEFAULTS.toolbar);
+                    el.innerHTML = resolveCatalogIcon(iconId);
+                });
             }
 
             selectElementAtLine(line) {
@@ -705,7 +806,7 @@ export class WebViewTemplateManager {
 
                 // Build content HTML
                 content.innerHTML = \`
-                    \${hasChildren ? '<span class="chevron">▶</span>' : '<span style="width: 0.75rem;"></span>'}
+                    \${hasChildren ? \`<span class="chevron">\${IconManager.getChevronIcon()}</span>\` : '<span style="width: 0.875rem;"></span>'}
                     <div class="features">
                         \${state.settings.showIconsInLabel && state.settings.iconType !== 'none' ? \`<span class="\${IconManager.getIconClass()}" data-tooltip="\${NodeRenderer.getTypeTooltip(node)}">\${IconManager.getTypeIcon(node.type)}</span>\` : ''}
                         \${NodeRenderer.getFeatureIcons(node)}
@@ -811,7 +912,7 @@ export class WebViewTemplateManager {
                 // Visibility ikonları her zaman göster (showIconsInLabel true ise)
                 const visIcon = IconManager.getVisibilityIcon(node.visibility);
                 if (visIcon) {
-                    const iconClass = state.settings.iconType === 'fontawesome' ? 'feature-fa-icon' : 'feature-icon';
+                    const iconClass = IconManager.getFeatureIconClass();
                     const visibilityName = node.visibility.charAt(0).toUpperCase() + node.visibility.slice(1);
                     const tooltip = state.settings.showTooltipPrefixes ? \`Visibility: \${visibilityName}\` : visibilityName;
                     features.push(\`<span class="\${iconClass} tooltip" data-tooltip="\${tooltip}">\${visIcon}</span>\`);
@@ -826,7 +927,7 @@ export class WebViewTemplateManager {
                     if (modifiers.includes('export') && modifiers.includes('default')) {
                         const defaultIcon = IconManager.getModifierIcon('default');
                         if (defaultIcon) {
-                            const iconClass = state.settings.iconType === 'fontawesome' ? 'feature-fa-icon' : 'feature-icon';
+                            const iconClass = IconManager.getFeatureIconClass();
                             const tooltip = state.settings.showTooltipPrefixes ? 'Modifier: Export Default' : 'Export Default';
                             features.push(\`<span class="\${iconClass} tooltip" data-tooltip="\${tooltip}">\${defaultIcon}</span>\`);
                         }
@@ -839,7 +940,7 @@ export class WebViewTemplateManager {
                         if (!addedModifiers.has(mod)) {
                             const icon = IconManager.getModifierIcon(mod);
                             if (icon) {
-                                const iconClass = state.settings.iconType === 'fontawesome' ? 'feature-fa-icon' : 'feature-icon';
+                                const iconClass = IconManager.getFeatureIconClass();
                                 const modifierName = mod.charAt(0).toUpperCase() + mod.slice(1);
                                 const tooltip = state.settings.showTooltipPrefixes ? \`Modifier: \${modifierName}\` : modifierName;
                                 features.push(\`<span class="\${iconClass} tooltip" data-tooltip="\${tooltip}">\${icon}</span>\`);
@@ -875,40 +976,83 @@ export class WebViewTemplateManager {
                 if (state.settings.iconType === 'fontawesome') {
                     return 'fa-icon tooltip';
                 }
+                if (state.settings.iconType === 'modern') {
+                    return 'svg-icon tooltip';
+                }
                 return 'type-icon tooltip';
             }
 
+            static getFeatureIconClass() {
+                if (state.settings.iconType === 'fontawesome') {
+                    return 'feature-fa-icon';
+                }
+                if (state.settings.iconType === 'modern') {
+                    return 'feature-svg-icon';
+                }
+                return 'feature-icon';
+            }
+
+            static getModernSvg(key) {
+                const iconId = resolveIconId(
+                    key,
+                    state.settings.modernIconSettings,
+                    ICON_DEFAULTS.modern
+                );
+                return resolveCatalogIcon(iconId);
+            }
+
+            static getChevronIcon() {
+                const iconId = resolveIconId(
+                    'chevron',
+                    state.settings.toolbarIconSettings,
+                    ICON_DEFAULTS.toolbar
+                );
+                return resolveCatalogIcon(iconId);
+            }
+
             static getTypeIcon(type) {
+                if (state.settings.iconType === 'modern') {
+                    return IconManager.getModernSvg(type);
+                }
                 if (state.settings.iconType === 'fontawesome') {
                     const faClass = state.settings.fontAwesomeSettings[type];
                     return faClass ? \`<i class="\${faClass}"></i>\` : '<i class="fas fa-question"></i>';
-                } else if (state.settings.iconType === 'emoji') {
+                }
+                if (state.settings.iconType === 'emoji') {
                     return state.settings.emojiSettings[type] || '❓';
                 }
-                return ''; // none
+                return '';
             }
 
             static getVisibilityIcon(visibility) {
                 if (!visibility || visibility === 'none') {
                     return '';
                 }
+                if (state.settings.iconType === 'modern') {
+                    return IconManager.getModernSvg(visibility);
+                }
                 if (state.settings.iconType === 'fontawesome') {
                     const faClass = state.settings.fontAwesomeSettings[visibility];
                     return faClass ? \`<i class="\${faClass}"></i>\` : '';
-                } else if (state.settings.iconType === 'emoji') {
+                }
+                if (state.settings.iconType === 'emoji') {
                     return state.settings.emojiSettings[visibility] || '';
                 }
                 return '';
             }
 
             static getModifierIcon(modifier) {
+                if (state.settings.iconType === 'modern') {
+                    return IconManager.getModernSvg(modifier);
+                }
                 if (state.settings.iconType === 'fontawesome') {
                     const faClass = state.settings.fontAwesomeSettings[modifier];
                     return faClass ? \`<i class="\${faClass}"></i>\` : '';
-                } else if (state.settings.iconType === 'emoji') {
+                }
+                if (state.settings.iconType === 'emoji') {
                     return state.settings.emojiSettings[modifier] || '';
                 }
-                return ''; // none
+                return '';
             }
         }
 
@@ -1007,11 +1151,10 @@ export class WebViewTemplateManager {
             }
         });
 
-        // Apply initial font styles
-        setTimeout(() => {
-            state.updateFontStyles();
-            state.updateToolbar();
-        }, 100);
+        // Apply initial styles and toolbar icons
+        state.updateFontStyles();
+        state.updateToolbarIcons();
+        state.updateToolbar();
     `;
     }
 
